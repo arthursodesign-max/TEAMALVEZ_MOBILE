@@ -1,0 +1,966 @@
+/* --- Custom CSS Variable Tokens --- */
+:root {
+    --bg-black: #050505;
+    --bg-dark-gray: #0d0d0d;
+    --bg-panel: rgba(13, 13, 13, 0.85);
+    --bg-card: rgba(20, 20, 20, 0.75);
+    --border-color: rgba(255, 255, 255, 0.08);
+    --border-silver: rgba(200, 200, 200, 0.15);
+    --border-gold: rgba(255, 215, 0, 0.3);
+    
+    --text-primary: #f2f2f2;
+    --text-secondary: #aaaaaa;
+    --text-muted: #555555;
+    
+    --gold: #FFD700;
+    --gold-glow: rgba(255, 215, 0, 0.4);
+    --gold-bright: #FFE033;
+    --gold-gradient: linear-gradient(135deg, #FFD700 0%, #B8860B 100%);
+    
+    --silver: #E5E5E5;
+    --silver-gradient: linear-gradient(135deg, #FFFFFF 0%, #999999 100%);
+    
+    --green-electric: #00E676;
+    --green-glow: rgba(0, 230, 118, 0.4);
+    --red-alert: #FF1744;
+    
+    --glass-blur: blur(12px);
+    --shadow-premium: 0 8px 25px rgba(0, 0, 0, 0.6);
+    --transition-smooth: all 0.25s ease-out;
+}
+
+/* --- Base Mobile Reset --- */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: 'Inter', sans-serif;
+    -webkit-tap-highlight-color: transparent; /* Disable tap blue glow on mobile */
+}
+
+body {
+    background-color: var(--bg-black);
+    color: var(--text-primary);
+    min-height: 100vh;
+    min-height: 100dvh;
+    overflow: hidden; /* Lock scroll on body to make it feel like a native app */
+    position: relative;
+}
+
+/* --- Background Canvas --- */
+#lightning-canvas {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 0;
+    pointer-events: none;
+}
+
+/* --- Transition Flash Overlay --- */
+#flash-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: #ffffff;
+    z-index: 9999;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.6s ease-out;
+}
+
+/* --- Helper Classes --- */
+.hidden {
+    display: none !important;
+}
+
+.text-gold {
+    color: var(--gold) !important;
+}
+
+.highlight-text {
+    background: var(--gold-gradient);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    font-weight: 700;
+}
+
+.glass-panel {
+    background: var(--bg-panel);
+    backdrop-filter: var(--glass-blur);
+    -webkit-backdrop-filter: var(--glass-blur);
+    border: 1px solid var(--border-color);
+    box-shadow: var(--shadow-premium);
+    border-radius: 12px;
+}
+
+.badge {
+    background: rgba(255, 255, 255, 0.04);
+    border: 1px solid var(--border-color);
+    padding: 4px 8px;
+    border-radius: 8px;
+    font-size: 0.7rem;
+    color: var(--text-secondary);
+    font-weight: 600;
+}
+
+/* --- 1. MOBILE LOGIN VIEW --- */
+#login-wrapper {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 10;
+    padding: 16px;
+}
+
+.login-card {
+    width: 100%;
+    max-width: 380px;
+    padding: 30px 20px;
+    text-align: center;
+    border: 1px solid var(--border-silver);
+}
+
+.login-logo {
+    height: 80px;
+    object-fit: contain;
+    filter: drop-shadow(0 0 10px rgba(255, 255, 255, 0.15));
+}
+
+.logo-title {
+    font-family: 'Orbitron', sans-serif;
+    font-size: 1.8rem;
+    font-weight: 900;
+    letter-spacing: 1.5px;
+    background: var(--silver-gradient);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    margin-top: 10px;
+}
+
+.logo-subtitle {
+    font-family: 'Orbitron', sans-serif;
+    font-size: 0.8rem;
+    font-weight: 700;
+    letter-spacing: 3px;
+    color: var(--gold);
+    margin-bottom: 25px;
+}
+
+.input-group {
+    text-align: left;
+    margin-bottom: 16px;
+}
+
+.input-group label {
+    display: block;
+    font-size: 0.8rem;
+    font-weight: 600;
+    color: var(--text-secondary);
+    margin-bottom: 6px;
+}
+
+.input-group label i {
+    margin-right: 4px;
+    color: var(--gold);
+}
+
+.input-group input {
+    width: 100%;
+    padding: 12px;
+    background: rgba(0, 0, 0, 0.6);
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+    color: var(--text-primary);
+    font-size: 0.9rem;
+    outline: none;
+}
+
+.input-group input:focus {
+    border-color: var(--gold);
+    box-shadow: 0 0 10px rgba(255, 215, 0, 0.15);
+}
+
+.btn-primary {
+    width: 100%;
+    height: 48px; /* Safe mobile height */
+    background: var(--gold-gradient);
+    border: none;
+    border-radius: 8px;
+    color: #000;
+    font-family: 'Orbitron', sans-serif;
+    font-weight: 700;
+    font-size: 0.9rem;
+    letter-spacing: 1.5px;
+    cursor: pointer;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 8px;
+}
+
+.btn-primary:active {
+    transform: scale(0.98);
+}
+
+.login-footer {
+    margin-top: 25px;
+    font-size: 0.7rem;
+    color: var(--text-muted);
+}
+
+
+/* --- 2. MOBILE APP VIEW --- */
+#app-wrapper {
+    display: flex;
+    flex-direction: column;
+    height: 100vh;
+    height: 100dvh;
+    z-index: 5;
+    position: relative;
+}
+
+/* Header */
+.app-header {
+    height: 56px;
+    padding: 0 16px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-radius: 0 0 12px 12px;
+    border-top: none;
+    z-index: 10;
+}
+
+.header-logo-title {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.header-logo {
+    height: 32px;
+    object-fit: contain;
+}
+
+.header-title {
+    font-family: 'Orbitron', sans-serif;
+    font-size: 1.1rem;
+    font-weight: 900;
+    letter-spacing: 1px;
+    background: var(--silver-gradient);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+}
+
+.header-logout-btn {
+    width: 38px;
+    height: 38px;
+    background: rgba(255, 23, 68, 0.1);
+    border: 1px solid rgba(255, 23, 68, 0.25);
+    border-radius: 8px;
+    color: #ff5252;
+    font-size: 0.9rem;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    cursor: pointer;
+}
+
+.header-logout-btn:active {
+    background: var(--red-alert);
+    color: #fff;
+}
+
+/* App Main Content Area */
+.app-main-content {
+    flex: 1;
+    overflow-y: auto;
+    padding: 16px;
+    padding-bottom: 90px; /* Safe padding for bottom menu bar */
+    -webkit-overflow-scrolling: touch; /* Momentum scrolling */
+}
+
+/* View Container Base */
+.app-view {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+}
+
+/* -- HOME VIEW SPECIFIC STYLES -- */
+.user-profile-header h2 {
+    font-size: 1.4rem;
+    font-weight: 600;
+}
+
+.user-profile-header p {
+    font-size: 0.78rem;
+    color: var(--text-secondary);
+    margin-top: 2px;
+}
+
+/* Energy Card Mobile */
+.energy-card-mobile {
+    padding: 16px;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.energy-title-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.energy-title-row h3 {
+    font-family: 'Orbitron', sans-serif;
+    font-size: 0.85rem;
+    font-weight: 700;
+    letter-spacing: 0.5px;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.energy-title-row span {
+    font-family: 'Orbitron', sans-serif;
+    font-size: 0.95rem;
+    font-weight: 900;
+    color: var(--gold);
+}
+
+.energy-progress-wrapper {
+    height: 12px;
+    background: #111;
+    border-radius: 6px;
+    overflow: hidden;
+    position: relative;
+    box-shadow: inset 0 1px 3px rgba(0,0,0,0.8);
+}
+
+#energy-bar-fill {
+    height: 100%;
+    width: 0%;
+    background: linear-gradient(90deg, #B8860B 0%, var(--gold) 60%, var(--gold-bright) 100%);
+    border-radius: 6px;
+    position: relative;
+    transition: width 0.4s ease-out;
+}
+
+.energy-glow {
+    position: absolute;
+    top: 0;
+    right: 0;
+    width: 10px;
+    height: 100%;
+    background: #fff;
+    filter: blur(3px);
+    opacity: 0.6;
+}
+
+.energy-msg {
+    font-size: 0.75rem;
+    color: var(--text-secondary);
+}
+
+/* Quick Summary Grid */
+.summary-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+}
+
+.summary-box {
+    padding: 14px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 6px;
+    cursor: pointer;
+}
+
+.summary-box i {
+    font-size: 1.2rem;
+}
+
+.summary-label {
+    font-size: 0.72rem;
+    color: var(--text-secondary);
+}
+
+.summary-value {
+    font-family: 'Orbitron', sans-serif;
+    font-size: 0.95rem;
+    font-weight: 700;
+    color: var(--gold);
+}
+
+/* Motto Card */
+.motto-card {
+    padding: 16px;
+    text-align: center;
+    font-style: italic;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.motto-text {
+    font-size: 0.8rem;
+    line-height: 1.4;
+    color: var(--text-secondary);
+}
+
+.motto-author {
+    font-family: 'Orbitron', sans-serif;
+    font-size: 0.65rem;
+    font-weight: 700;
+    color: var(--gold);
+    letter-spacing: 1px;
+}
+
+.btn-secondary-mobile {
+    width: 100%;
+    height: 44px;
+    background: rgba(255, 255, 255, 0.03);
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+    color: var(--text-secondary);
+    font-size: 0.8rem;
+    font-weight: 600;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 8px;
+    cursor: pointer;
+}
+
+.btn-secondary-mobile:active {
+    background: rgba(255, 255, 255, 0.08);
+}
+
+
+/* -- WORKOUT VIEW SPECIFIC STYLES -- */
+.view-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+    padding-bottom: 10px;
+}
+
+.view-header h2 {
+    font-family: 'Orbitron', sans-serif;
+    font-size: 1rem;
+    font-weight: 700;
+    letter-spacing: 0.5px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+/* Weekday Horizontal Scroll tabs */
+.weekday-scroller {
+    display: flex;
+    overflow-x: auto;
+    gap: 8px;
+    padding-bottom: 4px;
+    scrollbar-width: none; /* Hide scrollbar for Firefox */
+}
+
+.weekday-scroller::-webkit-scrollbar {
+    display: none; /* Hide scrollbar for Chrome/Safari */
+}
+
+.day-tab-btn {
+    flex: 0 0 54px; /* Fix width so it scrolls */
+    height: 38px;
+    background: rgba(255, 255, 255, 0.03);
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+    color: var(--text-secondary);
+    font-family: 'Orbitron', sans-serif;
+    font-size: 0.72rem;
+    font-weight: 700;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    cursor: pointer;
+}
+
+.day-tab-btn.active {
+    background: var(--gold-gradient);
+    border-color: var(--gold);
+    color: #000;
+}
+
+.workout-focus-container {
+    padding: 12px 16px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.focus-title {
+    font-size: 0.85rem;
+    font-weight: 700;
+}
+
+.focus-details {
+    font-size: 0.72rem;
+    font-weight: 700;
+    color: var(--gold);
+    background: rgba(255, 215, 0, 0.1);
+    border: 1px solid var(--border-gold);
+    padding: 3px 8px;
+    border-radius: 6px;
+}
+
+/* Lists */
+.mobile-list {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+/* List Item Cards (Exercises & Meals) */
+.exercise-card, .meal-card {
+    background: var(--bg-card);
+    border: 1px solid var(--border-color);
+    border-radius: 12px;
+    padding: 14px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 12px;
+    transition: var(--transition-smooth);
+}
+
+.exercise-info, .meal-info-mobile {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    flex: 1;
+}
+
+.exercise-name, .meal-title-mobile {
+    font-size: 0.88rem;
+    font-weight: 600;
+    color: var(--text-primary);
+}
+
+.exercise-details {
+    font-size: 0.75rem;
+    color: var(--text-secondary);
+}
+
+/* Check Button Optimized for Thumb Taps */
+.check-btn-mobile {
+    width: 44px;
+    height: 44px;
+    background: rgba(255, 255, 255, 0.03);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 10px;
+    color: var(--text-secondary);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    cursor: pointer;
+    font-size: 1.1rem;
+    transition: var(--transition-smooth);
+}
+
+/* Completed Card States */
+.exercise-card.completed, .meal-card.completed {
+    border-color: rgba(0, 230, 118, 0.2);
+    background: rgba(0, 230, 118, 0.01);
+}
+
+.exercise-card.completed .exercise-name, .meal-card.completed .meal-title-mobile {
+    color: var(--text-muted);
+    text-decoration: line-through;
+}
+
+.exercise-card.completed .exercise-details {
+    color: var(--text-muted);
+}
+
+.exercise-card.completed .check-btn-mobile, .meal-card.completed .check-btn-mobile {
+    background: rgba(0, 230, 118, 0.12);
+    border-color: var(--green-electric);
+    color: var(--green-electric);
+    box-shadow: 0 0 8px var(--green-glow);
+}
+
+/* Meal Details Specifically for Mobile */
+.meal-card {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 10px;
+}
+
+.meal-title-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.meal-time-badge {
+    padding: 3px 6px;
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 5px;
+    font-size: 0.65rem;
+    color: var(--text-secondary);
+    font-weight: 500;
+}
+
+.meal-details-list-mobile {
+    list-style-type: none;
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+    padding-left: 2px;
+}
+
+.meal-details-list-mobile li {
+    font-size: 0.78rem;
+    color: var(--text-secondary);
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.meal-details-list-mobile li::before {
+    content: "•";
+    color: var(--gold);
+    font-weight: bold;
+}
+
+.meal-card.completed .meal-details-list-mobile li {
+    color: var(--text-muted);
+    text-decoration: line-through;
+}
+
+.meal-card-footer {
+    display: flex;
+    justify-content: flex-end;
+}
+
+/* Touch Friendly Button for Meals */
+.meal-check-btn {
+    height: 38px;
+    padding: 0 14px;
+    background: rgba(255, 255, 255, 0.03);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 8px;
+    color: var(--text-secondary);
+    font-size: 0.72rem;
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    cursor: pointer;
+}
+
+.meal-card.completed .meal-check-btn {
+    background: rgba(0, 230, 118, 0.12);
+    border-color: var(--green-electric);
+    color: var(--green-electric);
+    box-shadow: 0 0 8px var(--green-glow);
+}
+
+
+/* --- BOTTOM NAVIGATION BAR --- */
+.bottom-nav {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    height: 60px;
+    display: flex;
+    justify-content: space-around;
+    align-items: center;
+    border-radius: 14px 14px 0 0;
+    border-bottom: none;
+    z-index: 10;
+    padding-bottom: env(safe-area-inset-bottom);
+    box-shadow: 0 -5px 20px rgba(0,0,0,0.8);
+}
+
+.nav-btn {
+    flex: 1;
+    height: 100%;
+    background: transparent;
+    border: none;
+    color: var(--text-secondary);
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    gap: 4px;
+    cursor: pointer;
+    transition: var(--transition-smooth);
+}
+
+.nav-btn i {
+    font-size: 1.15rem;
+}
+
+.nav-btn span {
+    font-size: 0.68rem;
+    font-weight: 600;
+}
+
+.nav-btn.active {
+    color: var(--gold);
+    text-shadow: 0 0 6px var(--gold-glow);
+}
+
+.nav-btn.active i {
+    transform: translateY(-2px) scale(1.1);
+    filter: drop-shadow(0 0 3px var(--gold-glow));
+}
+
+/* ==========================================
+   4. BOOST MODE & RADIANTE OVERLAY MOBILE
+   ========================================== */
+
+/* Screen Shake Effect (The "BOOM" impact) */
+.shake-screen {
+    animation: screen-shake-anim 0.4s cubic-bezier(.36,.07,.19,.97) both;
+    transform: translate3d(0, 0, 0);
+}
+
+@keyframes screen-shake-anim {
+    10%, 90% { transform: translate3d(-1px, 0, 0); }
+    20%, 80% { transform: translate3d(2px, -1px, 0); }
+    30%, 50%, 70% { transform: translate3d(-3px, 2px, 0); }
+    40%, 60% { transform: translate3d(3px, -2px, 0); }
+}
+
+/* Body Boost Active States */
+body.boost-active {
+    background-color: #070600;
+}
+
+body.boost-active .glass-panel {
+    border: 1px solid transparent;
+    background-image: linear-gradient(rgba(13, 13, 13, 0.92), rgba(13, 13, 13, 0.92)), 
+                      linear-gradient(90deg, transparent, var(--gold), var(--gold-bright), transparent);
+    background-origin: border-box;
+    background-clip: padding-box, border-box;
+    background-size: 100% 100%, 200% 100%;
+    animation: electric-current-panel 2.2s linear infinite;
+}
+
+body.boost-active .exercise-card,
+body.boost-active .meal-card {
+    border: 1px solid transparent;
+    background-image: linear-gradient(rgba(20, 20, 20, 0.96), rgba(20, 20, 20, 0.96)), 
+                      linear-gradient(90deg, transparent, var(--gold), var(--gold-bright), transparent);
+    background-origin: border-box;
+    background-clip: padding-box, border-box;
+    background-size: 100% 100%, 200% 100%;
+    animation: electric-current-card 1.6s linear infinite;
+}
+
+@keyframes electric-current-panel {
+    0% {
+        background-position: 0 0, 0 0;
+        box-shadow: 0 8px 30px rgba(0, 0, 0, 0.9), 0 0 8px rgba(255, 215, 0, 0.05);
+    }
+    50% {
+        box-shadow: 0 8px 30px rgba(0, 0, 0, 0.9), 0 0 18px rgba(255, 215, 0, 0.18);
+    }
+    100% {
+        background-position: 0 0, -200% 0;
+        box-shadow: 0 8px 30px rgba(0, 0, 0, 0.9), 0 0 8px rgba(255, 215, 0, 0.05);
+    }
+}
+
+@keyframes electric-current-card {
+    0% {
+        background-position: 0 0, 0 0;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.7), 0 0 4px rgba(255, 215, 0, 0.03);
+    }
+    50% {
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.7), 0 0 12px rgba(255, 215, 0, 0.12);
+    }
+    100% {
+        background-position: 0 0, -200% 0;
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.7), 0 0 4px rgba(255, 215, 0, 0.03);
+    }
+}
+
+body.boost-active .header-logo {
+    filter: drop-shadow(0 0 10px var(--gold));
+    animation: electricity-pulse 1s infinite alternate;
+}
+
+body.boost-active #energy-bar-fill {
+    box-shadow: 0 0 10px var(--gold-glow);
+}
+
+@keyframes electricity-pulse {
+    0% { transform: scale(1); filter: drop-shadow(0 0 2px var(--gold)); }
+    100% { transform: scale(1.06); filter: drop-shadow(0 0 8px var(--gold-bright)) brightness(1.15); }
+}
+
+/* Radiante Overlay Container */
+#radiante-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.94);
+    z-index: 10000;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    opacity: 1;
+    transition: opacity 0.5s ease;
+    padding: 20px;
+}
+
+#radiante-overlay.hidden {
+    display: none !important;
+}
+
+/* Radiante Content Card */
+.radiante-content {
+    background: rgba(12, 12, 12, 0.9);
+    border: 2px solid var(--gold);
+    box-shadow: 0 0 35px rgba(255, 215, 0, 0.25), inset 0 0 15px rgba(255, 215, 0, 0.08);
+    border-radius: 20px;
+    padding: 45px 20px 35px 20px;
+    width: 100%;
+    max-width: 380px;
+    text-align: center;
+    position: relative;
+    overflow: hidden;
+    animation: scale-up-shake 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.2) forwards;
+}
+
+@keyframes scale-up-shake {
+    0% { transform: scale(0.6) rotate(-3deg); opacity: 0; }
+    70% { transform: scale(1.04) rotate(2deg); }
+    100% { transform: scale(1) rotate(0deg); opacity: 1; }
+}
+
+/* Electric Bolts decorative */
+.radiante-bolts-container {
+    display: flex;
+    justify-content: center;
+    gap: 20px;
+    margin-bottom: 20px;
+    font-size: 2.5rem;
+    color: var(--gold);
+}
+
+.bolt-left {
+    animation: bolt-flicker-left 1.2s infinite;
+}
+
+.bolt-right {
+    animation: bolt-flicker-right 1.2s infinite 0.3s;
+}
+
+@keyframes bolt-flicker-left {
+    0%, 100% { transform: rotate(-15deg) scale(1); opacity: 1; }
+    50% { transform: rotate(-10deg) scale(1.15); filter: drop-shadow(0 0 10px var(--gold)); }
+}
+
+@keyframes bolt-flicker-right {
+    0%, 100% { transform: rotate(15deg) scale(1); opacity: 0.9; }
+    50% { transform: rotate(10deg) scale(1.15); filter: drop-shadow(0 0 10px var(--gold)); }
+}
+
+/* Shockwave animation */
+.radiante-shockwave {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 5px;
+    height: 5px;
+    border-radius: 50%;
+    background: radial-gradient(circle, rgba(255, 215, 0, 0.7) 0%, transparent 70%);
+    transform: translate(-50%, -50%);
+    animation: shockwave-expand 1.2s cubic-bezier(0.1, 0.8, 0.3, 1) infinite;
+    pointer-events: none;
+    z-index: 0;
+}
+
+@keyframes shockwave-expand {
+    0% { width: 0px; height: 0px; opacity: 1; }
+    100% { width: 450px; height: 450px; opacity: 0; }
+}
+
+/* Animated Title "CARACA, VC TÁ RADIANTE!" */
+.radiante-title {
+    font-family: 'Orbitron', sans-serif;
+    font-size: 1.55rem;
+    font-weight: 900;
+    line-height: 1.3;
+    background: linear-gradient(90deg, #FFFFFF, var(--gold), var(--gold-bright), #FFFFFF);
+    background-size: 300% auto;
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    animation: text-flow 3s linear infinite, glow-neon-text-mobile 1.5s ease-in-out infinite alternate;
+    margin-bottom: 12px;
+    letter-spacing: 0.5px;
+    position: relative;
+    z-index: 1;
+}
+
+@keyframes glow-neon-text-mobile {
+    0% { filter: drop-shadow(0 0 3px rgba(255,215,0,0.4)); }
+    100% { filter: drop-shadow(0 0 15px rgba(255,215,0,0.8)); }
+}
+
+.radiante-subtitle {
+    font-family: 'Orbitron', sans-serif;
+    font-size: 0.85rem;
+    font-weight: 700;
+    letter-spacing: 2px;
+    color: var(--text-secondary);
+    margin-bottom: 30px;
+    position: relative;
+    z-index: 1;
+}
+
+/* Action button for modal */
+.radiante-btn {
+    width: 100%;
+    height: 48px;
+    background: var(--gold-gradient);
+    border: none;
+    border-radius: 24px;
+    color: #000;
+    font-family: 'Orbitron', sans-serif;
+    font-weight: 900;
+    font-size: 0.85rem;
+    letter-spacing: 1.5px;
+    cursor: pointer;
+    box-shadow: 0 0 15px var(--gold-glow);
+    position: relative;
+    z-index: 1;
+}
+
+.radiante-btn:active {
+    transform: scale(0.97);
+}
+

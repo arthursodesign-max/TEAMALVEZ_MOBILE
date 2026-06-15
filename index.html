@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Team Alves - Consultoria | App Mobile</title>
+    <!-- Google Fonts: Orbitron & Inter -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Orbitron:wght@500;700;900&display=swap" rel="stylesheet">
+    <!-- FontAwesome for Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <!-- Canvas for lightning background, optimized for mobile screen -->
+    <canvas id="lightning-canvas"></canvas>
+
+    <!-- Transition Flash Overlay -->
+    <div id="flash-overlay"></div>
+
+    <!-- 1. MOBILE LOGIN VIEW -->
+    <div id="login-wrapper">
+        <div class="login-card glass-panel">
+            <div class="login-logo-container">
+                <img src="LOGO TEAM ALVES.png" alt="Team Alves Logo" class="login-logo">
+            </div>
+            <h1 class="logo-title">TEAM ALVES</h1>
+            <p class="logo-subtitle">CONSULTORIA ESPORTIVA</p>
+            
+            <form id="login-form">
+                <div class="input-group">
+                    <label for="username"><i class="fa-solid fa-user"></i> Usuário / Atleta</label>
+                    <input type="text" id="username" placeholder="Digite seu usuário" required autocomplete="username">
+                </div>
+                <div class="input-group">
+                    <label for="password"><i class="fa-solid fa-lock"></i> Senha</label>
+                    <input type="password" id="password" placeholder="Digite sua senha" required autocomplete="current-password">
+                </div>
+                <button type="submit" class="btn-primary glow-btn">
+                    <span>ENTRAR</span>
+                    <i class="fa-solid fa-bolt"></i>
+                </button>
+            </form>
+            
+            <div class="login-footer">
+                <p>Versão Mobile • Toque para Entrar</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- 2. MOBILE APP VIEW (HIDDEN BY DEFAULT) -->
+    <div id="app-wrapper" class="hidden">
+        <!-- Top App Bar -->
+        <header class="app-header glass-panel">
+            <div class="header-logo-title">
+                <img src="LOGO TEAM ALVES.png" alt="Team Alves Logo" class="header-logo">
+                <span class="header-title">TEAM ALVES</span>
+            </div>
+            <button id="logout-btn" class="header-logout-btn" title="Sair">
+                <i class="fa-solid fa-right-from-bracket"></i>
+            </button>
+        </header>
+
+        <!-- Main Content Area (Scrollable) -->
+        <main class="app-main-content">
+            
+            <!-- SECTION A: HOME / OVERVIEW VIEW -->
+            <section id="view-home" class="app-view">
+                <!-- User Profile Header -->
+                <div class="user-profile-header">
+                    <h2>Olá, <span class="highlight-text">Atleta!</span></h2>
+                    <p id="date-display">Carregando data...</p>
+                </div>
+
+                <!-- Energy Gauge Card -->
+                <div class="energy-card-mobile glass-panel">
+                    <div class="energy-title-row">
+                        <h3><i class="fa-solid fa-bolt-lightning text-gold"></i> ENERGIA DO DIA</h3>
+                        <span id="energy-percentage">0%</span>
+                    </div>
+                    <div class="energy-progress-wrapper">
+                        <div id="energy-bar-fill">
+                            <div class="energy-glow"></div>
+                        </div>
+                    </div>
+                    <p id="energy-msg" class="energy-msg">Carregando estado de energia...</p>
+                </div>
+
+                <!-- Quick Summary stats -->
+                <div class="summary-grid">
+                    <div class="summary-box glass-panel" onclick="switchTab('workout')">
+                        <i class="fa-solid fa-dumbbell text-gold"></i>
+                        <span class="summary-label">Treino do Dia</span>
+                        <span id="home-workout-progress" class="summary-value">0/5</span>
+                    </div>
+                    <div class="summary-box glass-panel" onclick="switchTab('diet')">
+                        <i class="fa-solid fa-apple-whole text-gold"></i>
+                        <span class="summary-label">Alimentação</span>
+                        <span id="home-diet-progress" class="summary-value">0/5</span>
+                    </div>
+                </div>
+
+                <!-- Motto Card -->
+                <div class="motto-card glass-panel">
+                    <p class="motto-text">"O único treino ruim é aquele que você não fez. Força total!"</p>
+                    <span class="motto-author">- TEAM ALVES</span>
+                </div>
+
+                <!-- Reset Button -->
+                <button id="reset-progress-btn" class="btn-secondary-mobile">
+                    <i class="fa-solid fa-rotate-left"></i> Resetar Progresso Diário
+                </button>
+            </section>
+
+            <!-- SECTION B: WORKOUT DETAILS VIEW (HIDDEN) -->
+            <section id="view-workout" class="app-view hidden">
+                <div class="view-header">
+                    <h2><i class="fa-solid fa-dumbbell text-gold"></i> TREINOS</h2>
+                    <span id="workout-overall-badge" class="badge">Progresso: 0/5</span>
+                </div>
+
+                <!-- Horizontal scrolling weekday tabs -->
+                <div class="weekday-scroller">
+                    <button class="day-tab-btn active" data-day="segunda">SEG</button>
+                    <button class="day-tab-btn" data-day="terca">TER</button>
+                    <button class="day-tab-btn" data-day="quarta">QUA</button>
+                    <button class="day-tab-btn" data-day="quinta">QUI</button>
+                    <button class="day-tab-btn" data-day="sexta">SEX</button>
+                    <button class="day-tab-btn" data-day="sabado">SÁB</button>
+                </div>
+
+                <!-- Focus and target -->
+                <div class="workout-focus-container glass-panel">
+                    <span class="focus-title" id="workout-day-name">Segunda-Feira</span>
+                    <span class="focus-details" id="workout-focus-badge">Peito e Tríceps</span>
+                </div>
+
+                <!-- Exercises Checklist -->
+                <div class="mobile-list" id="exercise-list-container">
+                    <!-- Populated dynamically -->
+                </div>
+            </section>
+
+            <!-- SECTION C: DIET PLAN VIEW (HIDDEN) -->
+            <section id="view-diet" class="app-view hidden">
+                <div class="view-header">
+                    <h2><i class="fa-solid fa-apple-whole text-gold"></i> DIETA</h2>
+                    <span id="diet-overall-badge" class="badge">Concluído: 0/5</span>
+                </div>
+
+                <!-- Meals Checklist -->
+                <div class="mobile-list" id="meal-list-container">
+                    <!-- Populated dynamically -->
+                </div>
+            </section>
+
+        </main>
+
+        <!-- Bottom Navigation Bar -->
+        <nav class="bottom-nav glass-panel">
+            <button class="nav-btn active" id="btn-tab-home" onclick="switchTab('home')">
+                <i class="fa-solid fa-house"></i>
+                <span>Início</span>
+            </button>
+            <button class="nav-btn" id="btn-tab-workout" onclick="switchTab('workout')">
+                <i class="fa-solid fa-dumbbell"></i>
+                <span>Treinos</span>
+            </button>
+            <button class="nav-btn" id="btn-tab-diet" onclick="switchTab('diet')">
+                <i class="fa-solid fa-apple-whole"></i>
+                <span>Dieta</span>
+            </button>
+        </nav>
+    </div>
+
+    <!-- 100% Boost / Radiante Overlay -->
+    <div id="radiante-overlay" class="hidden">
+        <div class="radiante-content">
+            <div class="radiante-shockwave"></div>
+            <div class="radiante-bolts-container">
+                <i class="fa-solid fa-bolt-lightning bolt-left"></i>
+                <i class="fa-solid fa-bolt-lightning bolt-right"></i>
+            </div>
+            <h2 class="radiante-title">CARACA, VC TÁ RADIANTE! ⚡</h2>
+            <p class="radiante-subtitle">FORÇA TOTAL DE 100% ATIVADA!</p>
+            <button class="radiante-btn glow-btn" onclick="closeRadianteOverlay()">ENTRAR NO MODO BOOST</button>
+        </div>
+    </div>
+
+    <!-- Script -->
+    <script src="script.js"></script>
+</body>
+</html>
