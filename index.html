@@ -2,9 +2,9 @@
 <html lang="pt-BR">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Team Alves - Consultoria | App Mobile</title>
-    <meta name="description" content="Aplicativo móvel oficial da consultoria Team Alves. Acesse sua rotina de treinos diária, dieta personalizada e envie suas medidas corporais.">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Team Alves - Consultoria Esportiva | Portal</title>
+    <meta name="description" content="Portal oficial de consultoria esportiva da Team Alves. Acesse sua ficha de treinos, plano alimentar e acompanhe sua evolução física.">
     <!-- Google Fonts: Orbitron & Inter -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -14,13 +14,13 @@
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
-    <!-- Canvas for lightning background, optimized for mobile screen -->
+    <!-- Background Canvas for Lightning Effects -->
     <canvas id="lightning-canvas"></canvas>
 
-    <!-- Transition Flash Overlay -->
+    <!-- Lightning Flash Overlay for Transitions -->
     <div id="flash-overlay"></div>
 
-    <!-- 1. MOBILE LOGIN VIEW -->
+    <!-- 1. LOGIN SCREEN -->
     <div id="login-wrapper">
         <div class="login-card glass-panel">
             <div class="login-logo-container">
@@ -35,522 +35,670 @@
                     <input type="text" id="username" placeholder="Digite seu usuário" required autocomplete="username">
                 </div>
                 <div class="input-group">
-                    <label for="password"><i class="fa-solid fa-lock"></i> Senha</label>
+                    <label for="password"><i class="fa-solid fa-lock"></i> Senha de Acesso</label>
                     <input type="password" id="password" placeholder="Digite sua senha" required autocomplete="current-password">
                 </div>
                 <button type="submit" class="btn-primary glow-btn">
-                    <span>ENTRAR</span>
+                    <span>ACESSAR PORTAL</span>
                     <i class="fa-solid fa-bolt"></i>
                 </button>
             </form>
             
             <div class="login-footer">
-                <p>Coach: <strong>coach</strong> / Senha: <strong>coach</strong></p>
-                <p>Alunos: <strong>arthur</strong> / <strong>alves</strong> (Senha: <strong>123</strong>)</p>
+                <p>Professor: <strong>coach</strong> / Senha: <strong>coach</strong></p>
+                <p>Alunos: <strong>arthur</strong> ou <strong>alves</strong> / Senha: <strong>123</strong></p>
             </div>
         </div>
     </div>
 
-    <!-- 2. MOBILE APP VIEW -->
-    <div id="app-wrapper" class="hidden">
-        <!-- Top App Bar -->
-        <header class="app-header glass-panel">
-            <div class="header-logo-title">
-                <img src="LOGO TEAM ALVES.png" alt="Team Alves Logo" class="header-logo">
-                <span class="header-title" id="app-header-title">TEAM ALVES</span>
+    <!-- 2. STUDENT DASHBOARD SCREEN -->
+    <div id="dashboard-wrapper" class="hidden">
+        <!-- Sidebar Navigation -->
+        <aside class="sidebar glass-panel">
+            <div class="sidebar-header">
+                <img src="LOGO TEAM ALVES.png" alt="Team Alves Logo" class="sidebar-logo">
+                <h2 class="sidebar-title">TEAM ALVES</h2>
+                <span class="sidebar-subtitle">ÁREA DO ALUNO</span>
             </div>
-            <button id="logout-btn" class="header-logout-btn" title="Sair">
-                <i class="fa-solid fa-right-from-bracket"></i>
-            </button>
-        </header>
 
-        <!-- Main Content Area (Scrollable) -->
-        <main class="app-main-content">
-            
-            <!-- SECTION A: HOME / OVERVIEW VIEW (STUDENT) -->
-            <section id="view-home" class="app-view">
-                <div class="user-profile-header">
-                    <h2>Olá, <span class="highlight-text" id="welcome-athlete-name">Atleta!</span></h2>
-                    <p id="date-display">Carregando data...</p>
-                </div>
-
-                <!-- Energy Gauge Card -->
-                <div class="energy-card-mobile glass-panel">
-                    <div class="energy-title-row">
-                        <h3><i class="fa-solid fa-bolt-lightning text-gold"></i> ENERGIA DO DIA</h3>
-                        <span id="energy-percentage">0%</span>
-                    </div>
-                    <div class="energy-progress-wrapper">
-                        <div id="energy-bar-fill">
-                            <div class="energy-glow"></div>
-                        </div>
-                    </div>
-                    <p id="energy-msg" class="energy-msg">Carregando estado de energia...</p>
-                </div>
-
-                <!-- Quick Summary stats -->
-                <div class="summary-grid">
-                    <div class="summary-box glass-panel" onclick="switchTab('workout')">
-                        <i class="fa-solid fa-dumbbell text-gold"></i>
-                        <span class="summary-label">Treino do Dia</span>
-                        <span id="home-workout-progress" class="summary-value">0/5</span>
-                    </div>
-                    <div class="summary-box glass-panel" onclick="switchTab('diet')">
-                        <i class="fa-solid fa-apple-whole text-gold"></i>
-                        <span class="summary-label">Alimentação</span>
-                        <span id="home-diet-progress" class="summary-value">0/5</span>
-                    </div>
-                </div>
-
-                <!-- Motto Card -->
-                <div class="motto-card glass-panel">
-                    <p class="motto-text">"O único treino ruim é aquele que você não fez. Força total!"</p>
-                    <span class="motto-author">- TEAM ALVES</span>
-                </div>
-
-                <button id="reset-progress-btn" class="btn-secondary-mobile">
-                    <i class="fa-solid fa-rotate-left"></i> Resetar Progresso Diário
+            <!-- Student Sub-navigation Menu -->
+            <nav class="sidebar-nav">
+                <button id="nav-student-dashboard" class="sidebar-nav-btn active">
+                    <i class="fa-solid fa-dumbbell"></i> Treino & Dieta
                 </button>
-            </section>
+                <button id="nav-student-evolution" class="sidebar-nav-btn">
+                    <i class="fa-solid fa-chart-line"></i> Minha Evolução
+                </button>
+                <button id="nav-student-payments" class="sidebar-nav-btn">
+                    <i class="fa-solid fa-credit-card"></i> Pagamentos
+                </button>
+            </nav>
 
-            <!-- SECTION B: WORKOUT DETAILS VIEW (STUDENT) -->
-            <section id="view-workout" class="app-view hidden">
-                <div class="view-header">
-                    <h2><i class="fa-solid fa-dumbbell text-gold"></i> TREINOS</h2>
-                    <span id="workout-overall-badge" class="badge">Progresso: 0/5</span>
+            <!-- Day Energy Charging Bar -->
+            <div class="energy-panel">
+                <div class="energy-header">
+                    <span>CARGA DIÁRIA</span>
+                    <span id="energy-percentage">0%</span>
                 </div>
-
-                <div class="weekday-scroller">
-                    <button class="day-tab-btn active" data-day="segunda">SEG</button>
-                    <button class="day-tab-btn" data-day="terca">TER</button>
-                    <button class="day-tab-btn" data-day="quarta">QUA</button>
-                    <button class="day-tab-btn" data-day="quinta">QUI</button>
-                    <button class="day-tab-btn" data-day="sexta">SEX</button>
-                    <button class="day-tab-btn" data-day="sabado">SÁB</button>
-                </div>
-
-                <div class="workout-focus-container glass-panel">
-                    <span class="focus-title" id="workout-day-name">Segunda-Feira</span>
-                    <span class="focus-details" id="workout-focus-badge">Peito e Tríceps</span>
-                </div>
-
-                <div class="mobile-list" id="exercise-list-container">
-                    <!-- Populated dynamically -->
-                </div>
-            </section>
-
-            <!-- SECTION C: DIET PLAN VIEW (STUDENT) -->
-            <section id="view-diet" class="app-view hidden">
-                <div class="view-header">
-                    <h2><i class="fa-solid fa-apple-whole text-gold"></i> DIETA</h2>
-                    <span id="diet-overall-badge" class="badge">Concluído: 0/5</span>
-                </div>
-                <div class="mobile-list" id="meal-list-container">
-                    <!-- Populated dynamically -->
-                </div>
-            </section>
-
-            <!-- SECTION D: EVOLUTION & UPLOADS VIEW (STUDENT) -->
-            <section id="view-progress" class="app-view hidden">
-                <div class="view-header">
-                    <h2><i class="fa-solid fa-chart-line text-gold"></i> MINHA EVOLUÇÃO</h2>
-                </div>
-
-                <!-- Record physical measurements card -->
-                <div class="mobile-card-form glass-panel">
-                    <h3>Registrar Nova Medida</h3>
-                    <form id="mobile-metrics-form" class="mobile-metrics-grid">
-                        <div class="input-group">
-                            <label for="mob-weight">Peso (kg)</label>
-                            <input type="number" id="mob-weight" step="0.1" required>
-                        </div>
-                        <div class="input-group">
-                            <label for="mob-bf">BF (%)</label>
-                            <input type="number" id="mob-bf" step="0.1" required>
-                        </div>
-                        <div class="input-group">
-                            <label for="mob-waist">Cintura (cm)</label>
-                            <input type="number" id="mob-waist" step="0.1" required>
-                        </div>
-                        <div class="input-group">
-                            <label for="mob-arms">Braço (cm)</label>
-                            <input type="number" id="mob-arms" step="0.1" required>
-                        </div>
-                        <button type="submit" class="btn-primary" style="grid-column: span 2; height: 40px; margin-top: 5px;">Salvar</button>
-                    </form>
-                </div>
-
-                <!-- Photo Upload Zone -->
-                <div class="photo-upload-zone-mobile glass-panel">
-                    <label for="mob-photo-input" class="mob-upload-label">
-                        <i class="fa-solid fa-cloud-arrow-up text-gold"></i>
-                        <span>Upload Foto de Progresso</span>
-                        <input type="file" id="mob-photo-input" accept="image/*" style="display:none;">
-                    </label>
-                </div>
-
-                <!-- Photos Scroller -->
-                <h3 class="subsection-title">Minha Galeria de Fotos</h3>
-                <div class="mobile-gallery-wrapper" id="mobile-photos-gallery">
-                    <!-- Populated dynamically -->
-                </div>
-
-                <!-- Measures history card list -->
-                <h3 class="subsection-title">Histórico de Medidas</h3>
-                <div class="history-list-mobile" id="mobile-metrics-history-list">
-                    <!-- Populated dynamically -->
-                </div>
-            </section>
-
-            <!-- SECTION D2: PAYMENTS VIEW (STUDENT) -->
-            <section id="view-payments" class="app-view hidden">
-                <div class="view-header">
-                    <h2><i class="fa-solid fa-file-invoice-dollar text-gold"></i> FINANCEIRO</h2>
-                </div>
-
-                <!-- Monthly Status alert -->
-                <div id="mob-payment-status-card" class="payment-status-alert-mobile glass-panel">
-                    <i class="fa-solid fa-circle-exclamation"></i>
-                    <div>
-                        <h4 id="mob-payment-status-title">Mensalidade: Pendente</h4>
-                        <p id="mob-payment-status-desc">Aguardando confirmação de pagamento.</p>
+                <div class="energy-bar-container">
+                    <div id="energy-bar-fill">
+                        <div class="energy-glow"></div>
                     </div>
                 </div>
+                <div class="energy-status-msg">
+                    <i class="fa-solid fa-bolt-lightning text-gold pulse"></i>
+                    <span id="energy-msg">Sem carga. Inicie as tarefas!</span>
+                </div>
+            </div>
 
-                <!-- Fee Value & Pix Display -->
-                <div class="mobile-card-form glass-panel">
-                    <h3 style="margin-bottom: 12px;">Pagar Mensalidade</h3>
-                    <div style="font-size: 1.1rem; font-weight: 700; color: var(--gold); margin-bottom: 12px;">
-                        Valor: <span id="mob-student-fee-value">R$ 150,00</span>
-                    </div>
-                    
-                    <div class="mob-pix-box">
-                        <div style="display:flex; justify-content:space-between; align-items:center; font-size:0.75rem; margin-bottom: 6px;">
-                            <span><i class="fa-brands fa-pix text-gold"></i> Chave PIX</span>
-                            <button class="btn-copy-pix" onclick="copyPixKey()"><i class="fa-solid fa-copy"></i> Copiar</button>
-                        </div>
-                        <div class="pix-key-display-mobile" id="mob-student-pix-key">pix@teamalves.com.br</div>
-                    </div>
+            <!-- User Status Card -->
+            <div class="user-status-card">
+                <div class="user-avatar">
+                    <i class="fa-solid fa-user-ninja"></i>
+                </div>
+                <div class="user-info">
+                    <span class="user-name" id="student-display-name">Atleta</span>
+                    <span class="user-tier" id="student-display-meta">Altura: --</span>
+                </div>
+            </div>
 
-                    <div style="margin-top: 12px; background:rgba(255,255,255,0.02); border:1px solid rgba(255,255,255,0.05); padding:10px; border-radius:8px;">
-                        <h4 style="font-size:0.75rem; margin-bottom:4px;"><i class="fa-solid fa-building-columns text-gold"></i> Transferência Bancária</h4>
-                        <p id="mob-student-bank-details" style="font-size:0.7rem; color:var(--text-secondary); line-height: 1.3;">Banco Itaú - Ag 1234 - CC 56789-0</p>
+            <!-- Sidebar Actions -->
+            <div class="sidebar-actions">
+                <button id="reset-progress-btn" class="btn-secondary" title="Resetar progresso de hoje">
+                    <i class="fa-solid fa-rotate-left"></i> Resetar Progresso
+                </button>
+                <button id="student-logout-btn" class="btn-danger">
+                    <i class="fa-solid fa-right-from-bracket"></i> Sair do Painel
+                </button>
+            </div>
+        </aside>
+
+        <!-- Main Workspace -->
+        <main class="main-content">
+            <!-- Top Dashboard Bar -->
+            <header class="top-bar glass-panel">
+                <div class="top-bar-left">
+                    <h1 class="welcome-message">Olá, <span class="highlight-text" id="welcome-athlete-name">Atleta!</span> Foco no objetivo.</h1>
+                    <p class="current-date-display" id="date-display">Carregando data...</p>
+                </div>
+                <div class="top-bar-right">
+                    <div class="motto-badge">
+                        <i class="fa-solid fa-dumbbell text-gold"></i> Sem Desculpas
                     </div>
                 </div>
+            </header>
 
-                <!-- Credit Card Registration -->
-                <div class="mobile-card-form glass-panel" style="margin-top: 15px;">
-                    <h3>Cartão de Crédito</h3>
-                    
-                    <!-- Registered Card View -->
-                    <div id="mob-card-registered-display" class="hidden">
-                        <div class="virtual-card-mobile">
-                            <div class="card-chip"></div>
-                            <div class="card-number-mobile" id="mob-registered-card-number">**** **** **** 4321</div>
-                            <div style="display:flex; justify-content:space-between; font-size:0.65rem; color:#ccc;">
-                                <span id="mob-registered-card-holder">ARTHUR ALVES</span>
-                                <span id="mob-registered-card-expiry">12/30</span>
-                            </div>
+            <!-- SUBVIEW A: WORKOUT AND DIET GRID -->
+            <div id="student-dashboard-view" class="dashboard-grid">
+                <!-- COLUMN 1: WORKOUT OF THE WEEK -->
+                <section class="grid-section glass-panel" id="workout-section">
+                    <div class="section-header">
+                        <h2><i class="fa-solid fa-calendar-week text-gold"></i> TREINO DA SEMANA</h2>
+                        <div class="workout-progress-container">
+                            <span class="badge">Progresso: <strong id="workout-count">0/5</strong></span>
                         </div>
-                        <button class="btn-danger" onclick="deleteStudentCard()" style="margin-top: 10px; height: 36px; font-size: 0.8rem; width: 100%;">
-                            <i class="fa-solid fa-trash"></i> Remover Cartão
-                        </button>
                     </div>
 
-                    <!-- Card Form -->
-                    <div id="mob-card-form-wrapper">
-                        <p style="font-size:0.7rem; color:var(--text-secondary); margin-bottom:10px;">Cadastre seu cartão para faturamento automático:</p>
-                        <form id="mob-credit-card-form" class="mobile-metrics-grid">
-                            <div class="input-group" style="grid-column: span 2;">
-                                <label for="mob-card-num">Número do Cartão</label>
-                                <input type="text" id="mob-card-num" placeholder="0000 0000 0000 0000" maxlength="19" required>
-                            </div>
-                            <div class="input-group" style="grid-column: span 2;">
-                                <label for="mob-card-name">Nome no Cartão</label>
-                                <input type="text" id="mob-card-name" placeholder="TITULAR" required>
+                    <!-- Weekday navigation tabs -->
+                    <div class="weekday-tabs">
+                        <button class="tab-btn active" data-day="segunda">SEG</button>
+                        <button class="tab-btn" data-day="terca">TER</button>
+                        <button class="tab-btn" data-day="quarta">QUA</button>
+                        <button class="tab-btn" data-day="quinta">QUI</button>
+                        <button class="tab-btn" data-day="sexta">SEX</button>
+                        <button class="tab-btn" data-day="sabado">SÁB</button>
+                    </div>
+
+                    <!-- Selected Day Workout Details -->
+                    <div class="workout-display">
+                        <div class="workout-day-title-wrapper">
+                            <h3 id="workout-day-name">Segunda-Feira</h3>
+                            <span id="workout-focus-badge" class="focus-badge">Peito e Tríceps</span>
+                        </div>
+                        <div class="exercise-list" id="exercise-list-container">
+                            <!-- Populated dynamically -->
+                        </div>
+                    </div>
+                </section>
+
+                <!-- COLUMN 2: DIET PLAN OF THE DAY -->
+                <section class="grid-section glass-panel" id="diet-section">
+                    <div class="section-header">
+                        <h2><i class="fa-solid fa-apple-whole text-gold"></i> DIETA DE HOJE</h2>
+                        <div class="diet-progress-container">
+                            <span class="badge">Refeições: <strong id="diet-count">0/5</strong></span>
+                        </div>
+                    </div>
+                    <div class="meal-list" id="meal-list-container">
+                        <!-- Populated dynamically -->
+                    </div>
+                </section>
+            </div>
+
+            <!-- SUBVIEW B: STUDENT EVOLUTION / PROGRESS LOGS -->
+            <div id="student-evolution-view" class="evolution-container hidden">
+                <div class="evolution-grid">
+                    <!-- Column 1: Record metrics & history table -->
+                    <section class="glass-panel evolution-panel">
+                        <div class="section-header">
+                            <h2><i class="fa-solid fa-weight-scale text-gold"></i> REGISTRO DE MEDIDAS</h2>
+                        </div>
+                        <form id="measurements-form" class="metric-form-grid">
+                            <div class="input-group">
+                                <label for="metric-weight">Peso (kg)</label>
+                                <input type="number" id="metric-weight" step="0.1" required>
                             </div>
                             <div class="input-group">
-                                <label for="mob-card-expiry">Validade</label>
-                                <input type="text" id="mob-card-expiry" placeholder="MM/AA" maxlength="5" required>
+                                <label for="metric-bf">Gordura / BF (%)</label>
+                                <input type="number" id="metric-bf" step="0.1" required>
                             </div>
                             <div class="input-group">
-                                <label for="mob-card-cvv">CVV</label>
-                                <input type="text" id="mob-card-cvv" placeholder="CVV" maxlength="4" required>
+                                <label for="metric-chest">Tórax (cm)</label>
+                                <input type="number" id="metric-chest" step="0.1" required>
                             </div>
-                            <button type="submit" class="btn-primary" style="grid-column: span 2; height: 36px; margin-top: 5px; font-size:0.8rem;">
-                                Salvar Cartão
+                            <div class="input-group">
+                                <label for="metric-waist">Cintura (cm)</label>
+                                <input type="number" id="metric-waist" step="0.1" required>
+                            </div>
+                            <div class="input-group">
+                                <label for="metric-arms">Braço (cm)</label>
+                                <input type="number" id="metric-arms" step="0.1" required>
+                            </div>
+                            <div class="input-group">
+                                <label for="metric-legs">Coxa (cm)</label>
+                                <input type="number" id="metric-legs" step="0.1" required>
+                            </div>
+                            <button type="submit" class="btn-primary" style="grid-column: span 2; height: 44px; margin-top: 10px;">
+                                <i class="fa-solid fa-circle-plus"></i> Salvar Medidas
                             </button>
                         </form>
-                    </div>
-                </div>
 
-                <!-- Proof Upload Mobile -->
-                <div class="mobile-card-form glass-panel" style="margin-top: 15px;">
-                    <h3>Enviar Comprovante</h3>
-                    <div class="input-group" style="margin-bottom: 10px;">
-                        <label for="mob-proof-month-select">Selecione a Cobrança</label>
-                        <select id="mob-proof-month-select" class="premium-select-mobile" style="width:100%;">
+                        <div class="history-table-wrapper" style="margin-top: 30px;">
+                            <h3>Histórico de Medidas</h3>
+                            <table class="premium-table">
+                                <thead>
+                                    <tr>
+                                        <th>Data</th>
+                                        <th>Peso</th>
+                                        <th>BF%</th>
+                                        <th>Cintura</th>
+                                        <th>Braço</th>
+                                        <th>Coxa</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="student-metrics-table-body">
+                                    <!-- Populated dynamically -->
+                                </tbody>
+                            </table>
+                        </div>
+                    </section>
+
+                    <!-- Column 2: Upload Progress Photos -->
+                    <section class="glass-panel evolution-panel">
+                        <div class="section-header">
+                            <h2><i class="fa-solid fa-camera text-gold"></i> FOTOS DE PROGRESSO</h2>
+                        </div>
+                        <div class="photo-upload-container">
+                            <label for="photo-file-input" class="photo-upload-label">
+                                <i class="fa-solid fa-cloud-arrow-up text-gold"></i>
+                                <span>Adicionar Foto de Evolução</span>
+                                <input type="file" id="photo-file-input" accept="image/*" style="display:none;">
+                            </label>
+                        </div>
+                        <div class="photos-gallery" id="student-photos-gallery">
                             <!-- Populated dynamically -->
-                        </select>
-                    </div>
-                    <div class="photo-upload-zone-mobile" style="height: auto; padding: 15px;">
-                        <label for="mob-proof-file-input" class="mob-upload-label">
-                            <i class="fa-solid fa-cloud-arrow-up text-gold"></i>
-                            <span id="mob-proof-file-label">Selecionar Imagem do Recibo</span>
-                            <input type="file" id="mob-proof-file-input" accept="image/*" style="display:none;">
-                        </label>
-                    </div>
+                        </div>
+                    </section>
                 </div>
+            </div>
+            
+            <!-- SUBVIEW C: STUDENT PAYMENTS / FINANCE -->
+            <div id="student-payments-view" class="payments-container hidden">
+                <div class="payments-grid">
+                    <!-- Column 1: Payment Info & Virtual Card Registration -->
+                    <section class="glass-panel payments-panel">
+                        <div class="section-header">
+                            <h2><i class="fa-solid fa-file-invoice-dollar text-gold"></i> DETALHES DO PAGAMENTO</h2>
+                        </div>
+                        
+                        <!-- Status Alert Card -->
+                        <div id="payment-status-card" class="payment-status-alert">
+                            <i class="fa-solid fa-circle-exclamation"></i>
+                            <div>
+                                <h4 id="payment-status-title">Status: Pendente</h4>
+                                <p id="payment-status-desc">Aguardando confirmação de pagamento para este mês.</p>
+                            </div>
+                        </div>
 
-                <!-- Billing History Mobile -->
-                <h3 class="subsection-title">Histórico Financeiro</h3>
-                <div class="history-list-mobile" id="mobile-payments-history-list">
-                    <!-- Populated dynamically -->
-                </div>
-            </section>
+                        <!-- Payment Methods Info -->
+                        <div class="payment-methods-box">
+                            <h3>Valor Mensal: <span class="highlight-text" id="student-fee-value">R$ 150,00</span></h3>
+                            
+                            <div class="pix-payment-box">
+                                <div class="pix-header">
+                                    <span><i class="fa-brands fa-pix text-gold"></i> Pagar via PIX</span>
+                                    <button class="btn-copy-pix" onclick="copyPixKey()"><i class="fa-solid fa-copy"></i> Copiar</button>
+                                </div>
+                                <div class="pix-key-display" id="student-pix-key">pix@teamalves.com.br</div>
+                            </div>
 
-            <!-- SECTION E: STUDENTS GRID (COACH) -->
-            <section id="view-coach" class="app-view hidden">
-                <div class="view-header" style="flex-direction: column; align-items: flex-start; gap: 8px;">
-                    <h2><i class="fa-solid fa-users text-gold"></i> ALUNOS</h2>
-                    <select id="coach-mobile-filter" class="premium-select-mobile" style="width: 100%; height: 36px; background: rgba(0,0,0,0.5); color: var(--text-primary); border: 1px solid var(--border-color); border-radius: 8px; font-family: 'Orbitron'; font-size: 0.8rem; padding: 0 8px;">
-                        <option value="active">ATIVOS</option>
-                        <option value="archived">ARQUIVADOS</option>
-                        <option value="trash">LIXEIRA</option>
-                    </select>
-                </div>
-                <div class="coach-students-list-mobile" id="coach-students-list-container">
-                    <!-- Populated dynamically -->
-                </div>
-            </section>
+                            <div class="bank-payment-box">
+                                <h4><i class="fa-solid fa-building-columns text-gold"></i> Transferência Bancária</h4>
+                                <p id="student-bank-details">Banco Itaú (341) - Agência: 1234 - Conta: 56789-0</p>
+                            </div>
+                        </div>
 
+                        <!-- Card Registration Virtual Layout -->
+                        <div class="card-registration-section">
+                            <h3><i class="fa-solid fa-credit-card text-gold"></i> Cartão de Crédito</h3>
+                            
+                            <div id="card-registered-display" class="hidden">
+                                <div class="virtual-card">
+                                    <div class="card-chip"></div>
+                                    <div class="card-number" id="registered-card-number">**** **** **** 4321</div>
+                                    <div class="card-footer">
+                                        <div class="card-holder" id="registered-card-holder">ARTHUR ALVES</div>
+                                        <div class="card-expiry" id="registered-card-expiry">12/30</div>
+                                    </div>
+                                    <div class="card-brand"><i class="fa-brands fa-cc-visa"></i></div>
+                                </div>
+                                <button class="btn-danger" id="btn-remove-card" onclick="deleteStudentCard()" style="margin-top: 15px; height: 38px;">
+                                    <i class="fa-solid fa-trash"></i> Remover Cartão Cadastrado
+                                </button>
+                            </div>
+
+                            <div id="card-form-wrapper">
+                                <p class="card-note">Cadastre seu cartão para pagamentos automáticos recorrentes:</p>
+                                <form id="credit-card-form" class="card-form-grid">
+                                    <div class="input-group" style="grid-column: span 2;">
+                                        <label for="card-num">Número do Cartão</label>
+                                        <input type="text" id="card-num" placeholder="0000 0000 0000 0000" maxlength="19" required>
+                                    </div>
+                                    <div class="input-group" style="grid-column: span 2;">
+                                        <label for="card-name">Nome Impresso no Cartão</label>
+                                        <input type="text" id="card-name" placeholder="NOME DO TITULAR" required>
+                                    </div>
+                                    <div class="input-group">
+                                        <label for="card-expiry">Validade</label>
+                                        <input type="text" id="card-expiry" placeholder="MM/AA" maxlength="5" required>
+                                    </div>
+                                    <div class="input-group">
+                                        <label for="card-cvv">CVV</label>
+                                        <input type="text" id="card-cvv" placeholder="000" maxlength="4" required>
+                                    </div>
+                                    <button type="submit" class="btn-primary" style="grid-column: span 2; height: 40px; margin-top: 10px;">
+                                        <i class="fa-solid fa-circle-check"></i> Cadastrar Cartão
+                                    </button>
+                                </form>
+                            </div>
+                        </div>
+                    </section>
+
+                    <!-- Column 2: Upload Proof & History -->
+                    <section class="glass-panel payments-panel">
+                        <div class="section-header">
+                            <h2><i class="fa-solid fa-cloud-arrow-up text-gold"></i> ENVIAR COMPROVANTE</h2>
+                        </div>
+                        
+                        <div class="proof-upload-box">
+                            <div class="input-group">
+                                <label for="proof-month-select">Selecione o Mês Referente</label>
+                                <select id="proof-month-select" class="premium-select" style="width: 100%;">
+                                    <!-- Populated dynamically -->
+                                </select>
+                            </div>
+                            <div class="photo-upload-container" style="margin-top: 15px;">
+                                <label for="proof-file-input" class="photo-upload-label">
+                                    <i class="fa-solid fa-cloud-arrow-up text-gold"></i>
+                                    <span>Selecionar Imagem do Comprovante</span>
+                                    <input type="file" id="proof-file-input" accept="image/*" style="display:none;">
+                                </label>
+                            </div>
+                        </div>
+
+                        <div class="history-table-wrapper" style="margin-top: 30px;">
+                            <h3>Histórico de Faturamento</h3>
+                            <table class="premium-table">
+                                <thead>
+                                    <tr>
+                                        <th>Mês</th>
+                                        <th>Valor</th>
+                                        <th>Status</th>
+                                        <th>Comprovante</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="student-payments-table-body">
+                                    <!-- Populated dynamically -->
+                                </tbody>
+                            </table>
+                        </div>
+                    </section>
+                </div>
+            </div>
         </main>
-
-        <!-- Bottom Navigation Bar (Dynamic visibilities controlled by JS) -->
-        <nav class="bottom-nav glass-panel">
-            <!-- Student Navigation buttons -->
-            <button class="nav-btn active student-nav-item" id="btn-tab-home" onclick="switchTab('home')">
-                <i class="fa-solid fa-house"></i>
-                <span>Início</span>
-            </button>
-            <button class="nav-btn student-nav-item" id="btn-tab-workout" onclick="switchTab('workout')">
-                <i class="fa-solid fa-dumbbell"></i>
-                <span>Treinos</span>
-            </button>
-            <button class="nav-btn student-nav-item" id="btn-tab-diet" onclick="switchTab('diet')">
-                <i class="fa-solid fa-apple-whole"></i>
-                <span>Dieta</span>
-            </button>
-            <button class="nav-btn student-nav-item" id="btn-tab-progress" onclick="switchTab('progress')">
-                <i class="fa-solid fa-chart-line"></i>
-                <span>Evolução</span>
-            </button>
-            <button class="nav-btn student-nav-item" id="btn-tab-payments" onclick="switchTab('payments')">
-                <i class="fa-solid fa-credit-card"></i>
-                <span>Pagar</span>
-            </button>
-
-            <!-- Coach Navigation buttons -->
-            <button class="nav-btn coach-nav-item hidden" id="btn-tab-coach" onclick="switchTab('coach')">
-                <i class="fa-solid fa-users"></i>
-                <span>Alunos</span>
-            </button>
-            <button class="nav-btn coach-nav-item hidden" id="btn-tab-register" onclick="openMobileRegisterModal()">
-                <i class="fa-solid fa-user-plus"></i>
-                <span>Novo Aluno</span>
-            </button>
-        </nav>
     </div>
 
-    <!-- 3. MOBILE MODAL: REGISTER STUDENT -->
-    <div id="mobile-register-modal" class="mobile-modal-wrapper hidden">
-        <div class="mobile-modal-card glass-panel">
-            <div class="modal-header">
-                <h3><i class="fa-solid fa-user-plus text-gold"></i> NOVO CADASTRO</h3>
-                <button class="modal-close-btn" onclick="closeMobileRegisterModal()"><i class="fa-solid fa-xmark"></i></button>
+    <!-- 3. COACH DASHBOARD SCREEN (HIDDEN BY DEFAULT) -->
+    <div id="coach-wrapper" class="hidden">
+        <!-- Sidebar Navigation -->
+        <aside class="sidebar glass-panel">
+            <div class="sidebar-header">
+                <img src="LOGO TEAM ALVES.png" alt="Team Alves Logo" class="sidebar-logo">
+                <h2 class="sidebar-title">TEAM ALVES</h2>
+                <span class="sidebar-subtitle">PAINEL DO COACH</span>
             </div>
-            <form id="mobile-register-form">
+
+            <nav class="sidebar-nav">
+                <button id="nav-coach-students" class="sidebar-nav-btn active">
+                    <i class="fa-solid fa-users"></i> Alunos Cadastrados
+                </button>
+                <button id="nav-coach-archived" class="sidebar-nav-btn">
+                    <i class="fa-solid fa-box-archive"></i> Arquivados
+                </button>
+                <button id="nav-coach-trash" class="sidebar-nav-btn">
+                    <i class="fa-solid fa-trash-can"></i> Lixeira
+                </button>
+                <button id="open-register-modal-btn" class="sidebar-nav-btn">
+                    <i class="fa-solid fa-user-plus"></i> Cadastrar Aluno
+                </button>
+            </nav>
+
+            <!-- User Status Card -->
+            <div class="user-status-card" style="margin-top: auto; margin-bottom: 20px;">
+                <div class="user-avatar">
+                    <i class="fa-solid fa-user-tie"></i>
+                </div>
+                <div class="user-info">
+                    <span class="user-name">Felipe Alves</span>
+                    <span class="user-tier">Treinador Chefe</span>
+                </div>
+            </div>
+
+            <!-- Sidebar Actions -->
+            <div class="sidebar-actions">
+                <button id="coach-logout-btn" class="btn-danger">
+                    <i class="fa-solid fa-right-from-bracket"></i> Sair do Painel
+                </button>
+            </div>
+        </aside>
+
+        <!-- Main Workspace -->
+        <main class="main-content">
+            <!-- Top Dashboard Bar -->
+            <header class="top-bar glass-panel">
+                <div class="top-bar-left">
+                    <h1 class="welcome-message">Olá, <span class="highlight-text">Coach Felipe!</span></h1>
+                    <p class="current-date-display" id="coach-date-display">Carregando data...</p>
+                </div>
+                <div class="top-bar-right">
+                    <div class="motto-badge">
+                        <i class="fa-solid fa-bolt text-gold"></i> Controle Total
+                    </div>
+                </div>
+            </header>
+
+            <!-- SUBVIEW C: LIST OF STUDENTS -->
+            <div id="coach-students-list-view" class="students-list-container">
+                <h2 class="dashboard-section-title" id="coach-section-title"><i class="fa-solid fa-users text-gold"></i> Meus Alunos</h2>
+                <div class="students-grid" id="coach-students-grid">
+                    <!-- Populated dynamically -->
+                </div>
+            </div>
+
+            <!-- SUBVIEW D: DETAILED STUDENT INSPECTOR -->
+            <div id="coach-student-inspector-view" class="student-inspector-container hidden">
+                <div class="inspector-header glass-panel">
+                    <button class="btn-secondary" onclick="backToStudentsList()" style="width: auto; padding: 8px 16px;">
+                        <i class="fa-solid fa-chevron-left"></i> Voltar à Lista
+                    </button>
+                    <div class="inspector-athlete-profile">
+                        <h2 id="inspector-student-name">Nome do Aluno</h2>
+                        <span class="focus-badge" id="inspector-student-meta">Idade: -- | Altura: --</span>
+                        <div class="inspector-quick-actions" style="margin-top: 8px; display: flex; gap: 8px; justify-content: center;">
+                            <button id="btn-quick-archive" class="btn-secondary" style="font-size: 0.75rem; padding: 4px 8px; width: auto; height: 26px; display: inline-flex; align-items: center; gap: 5px;">
+                                <i class="fa-solid fa-box-archive"></i> <span id="text-quick-archive">Arquivar</span>
+                            </button>
+                            <button id="btn-quick-trash" class="btn-danger" style="font-size: 0.75rem; padding: 4px 8px; width: auto; height: 26px; display: inline-flex; align-items: center; gap: 5px;">
+                                <i class="fa-solid fa-trash-can"></i> <span id="text-quick-trash">Excluir</span>
+                            </button>
+                        </div>
+                    </div>
+                    <div class="inspector-tab-controls">
+                        <button class="tab-btn active" id="btn-inspect-evolution" onclick="switchInspectorTab('evolution')">Avaliações</button>
+                        <button class="tab-btn" id="btn-inspect-prescribe" onclick="switchInspectorTab('prescribe')">Prescrever</button>
+                        <button class="tab-btn" id="btn-inspect-payments" onclick="switchInspectorTab('payments')">Pagamentos</button>
+                    </div>
+                </div>
+
+                <!-- Inspector Subview: Evolution details -->
+                <div id="inspector-tab-evolution" class="inspector-tab-content">
+                    <div class="evolution-grid">
+                        <section class="glass-panel evolution-panel">
+                            <h3>Evolução Fisiológica</h3>
+                            
+                            <!-- Form to allow Coach to register new measurements directly -->
+                            <form id="coach-measurements-form" class="metric-form-grid" style="margin-bottom: 25px;">
+                                <div class="input-group">
+                                    <label for="coach-metric-weight">Peso (kg)</label>
+                                    <input type="number" id="coach-metric-weight" step="0.1" required>
+                                </div>
+                                <div class="input-group">
+                                    <label for="coach-metric-bf">BF (%)</label>
+                                    <input type="number" id="coach-metric-bf" step="0.1" required>
+                                </div>
+                                <div class="input-group">
+                                    <label for="coach-metric-chest">Tórax (cm)</label>
+                                    <input type="number" id="coach-metric-chest" step="0.1" required>
+                                </div>
+                                <div class="input-group">
+                                    <label for="coach-metric-waist">Cintura (cm)</label>
+                                    <input type="number" id="coach-metric-waist" step="0.1" required>
+                                </div>
+                                <div class="input-group">
+                                    <label for="coach-metric-arms">Braço (cm)</label>
+                                    <input type="number" id="coach-metric-arms" step="0.1" required>
+                                </div>
+                                <div class="input-group">
+                                    <label for="coach-metric-legs">Coxa (cm)</label>
+                                    <input type="number" id="coach-metric-legs" step="0.1" required>
+                                </div>
+                                <button type="submit" class="btn-primary" style="grid-column: span 2; height: 38px; margin-top: 5px; font-size: 0.85rem;">
+                                    <i class="fa-solid fa-circle-plus"></i> Registrar Novas Medidas
+                                </button>
+                            </form>
+
+                            <table class="premium-table">
+                                <thead>
+                                    <tr>
+                                        <th>Data</th>
+                                        <th>Peso (kg)</th>
+                                        <th>BF (%)</th>
+                                        <th>Cintura</th>
+                                        <th>Braço</th>
+                                        <th>Coxa</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="inspector-metrics-table-body">
+                                    <!-- Populated dynamically -->
+                                </tbody>
+                            </table>
+                        </section>
+                        <section class="glass-panel evolution-panel">
+                            <h3>Fotos de Evolução</h3>
+                            <div class="photos-gallery" id="inspector-photos-gallery">
+                                <!-- Populated dynamically -->
+                            </div>
+                        </section>
+                    </div>
+                </div>
+
+                <!-- Inspector Subview: Prescribe workout & diet -->
+                <div id="inspector-tab-prescribe" class="inspector-tab-content hidden">
+                    <div class="prescription-grid">
+                        <!-- Prescribe Workout -->
+                        <section class="glass-panel prescription-panel">
+                            <div class="section-header">
+                                <h3><i class="fa-solid fa-dumbbell text-gold"></i> Editar Ficha de Treino</h3>
+                                <select id="prescription-workout-day-select" class="premium-select" onchange="loadPrescriptionWorkoutDay()">
+                                    <option value="segunda">Segunda-Feira</option>
+                                    <option value="terca">Terça-Feira</option>
+                                    <option value="quarta">Quarta-Feira</option>
+                                    <option value="quinta">Quinta-Feira</option>
+                                    <option value="sexta">Sexta-Feira</option>
+                                    <option value="sabado">Sábado</option>
+                                </select>
+                            </div>
+                            <div class="prescription-field">
+                                <label for="prescription-workout-focus">Foco do Dia (Ex: Peito e Tríceps)</label>
+                                <input type="text" id="prescription-workout-focus" class="premium-input">
+                            </div>
+                            <div class="prescription-field">
+                                <label for="prescription-workout-content">Exercícios (Um por linha no formato: Exercício | Séries x Reps)</label>
+                                <textarea id="prescription-workout-content" class="premium-textarea" rows="10" placeholder="Supino Reto Barra | 4x10&#10;Tríceps Corda | 4x15"></textarea>
+                            </div>
+                            <button class="btn-primary" onclick="savePrescribedWorkout()" style="height: 44px; margin-top: 10px;">
+                                <i class="fa-solid fa-floppy-disk"></i> Salvar Treino deste Dia
+                            </button>
+                        </section>
+
+                        <!-- Prescribe Diet -->
+                        <section class="glass-panel prescription-panel">
+                            <div class="section-header">
+                                <h3><i class="fa-solid fa-apple-whole text-gold"></i> Editar Plano Alimentar</h3>
+                            </div>
+                            <div class="prescription-field">
+                                <label for="prescription-diet-content">Refeições (Uma refeição por bloco, separando horários, nome e alimentos por linhas. Use '---' para separar refeições)</label>
+                                <textarea id="prescription-diet-content" class="premium-textarea" rows="14" placeholder="07:30 | Café da Manhã&#10;3 Ovos inteiros&#10;2 Pães integrais&#10;---&#10;12:30 | Almoço&#10;150g Frango grelhado&#10;200g Arroz"></textarea>
+                            </div>
+                            <button class="btn-primary" onclick="savePrescribedDiet()" style="height: 44px; margin-top: 10px;">
+                                <i class="fa-solid fa-floppy-disk"></i> Salvar Toda a Dieta
+                            </button>
+                        </section>
+                    </div>
+                </div>
+
+                <!-- Inspector Subview: Payments -->
+                <div id="inspector-tab-payments" class="inspector-tab-content hidden">
+                    <div class="prescription-grid">
+                        <!-- Configuration Card -->
+                        <section class="glass-panel prescription-panel">
+                            <div class="section-header">
+                                <h3><i class="fa-solid fa-gears text-gold"></i> Configuração de Cobrança</h3>
+                            </div>
+                            <div class="prescription-field">
+                                <label for="coach-student-fee">Valor da Mensalidade (R$)</label>
+                                <input type="number" id="coach-student-fee" class="premium-input" step="0.01">
+                            </div>
+                            <div class="prescription-field">
+                                <label for="coach-pix-key">Chave PIX da Assessoria</label>
+                                <input type="text" id="coach-pix-key" class="premium-input">
+                            </div>
+                            <div class="prescription-field">
+                                <label for="coach-bank-details">Dados Bancários para Transferência</label>
+                                <input type="text" id="coach-bank-details" class="premium-input">
+                            </div>
+                            <button class="btn-primary" onclick="saveCoachPaymentConfig()" style="height: 44px; margin-top: 10px;">
+                                <i class="fa-solid fa-floppy-disk"></i> Salvar Configuração
+                            </button>
+                        </section>
+
+                        <!-- Record new payment billing & attachments -->
+                        <section class="glass-panel prescription-panel">
+                            <div class="section-header">
+                                <h3><i class="fa-solid fa-circle-dollar-to-slot text-gold"></i> Lançar Mensalidade / Cobrança</h3>
+                            </div>
+                            <form id="coach-payment-form">
+                                <div class="prescription-field">
+                                    <label for="coach-payment-month">Mês de Referência (ex: Julho/2026)</label>
+                                    <input type="text" id="coach-payment-month" class="premium-input" placeholder="Mês/Ano" required>
+                                </div>
+                                <div class="prescription-field">
+                                    <label for="coach-payment-amount">Valor Cobrado (R$)</label>
+                                    <input type="number" id="coach-payment-amount" class="premium-input" step="0.01" required>
+                                </div>
+                                <div class="prescription-field">
+                                    <label for="coach-payment-status">Status Inicial</label>
+                                    <select id="coach-payment-status" class="premium-select" style="width: 100%;">
+                                        <option value="Pendente">Pendente</option>
+                                        <option value="Pago">Pago</option>
+                                    </select>
+                                </div>
+                                <div class="prescription-field">
+                                    <label>Anexar Comprovante / Recibo (opcional)</label>
+                                    <div class="photo-upload-container" style="margin-top: 5px;">
+                                        <label for="coach-payment-file" class="photo-upload-label" style="padding: 10px;">
+                                            <i class="fa-solid fa-cloud-arrow-up text-gold"></i>
+                                            <span id="coach-payment-file-label">Selecionar Imagem</span>
+                                            <input type="file" id="coach-payment-file" accept="image/*" style="display:none;">
+                                        </label>
+                                    </div>
+                                </div>
+                                <button type="submit" class="btn-primary" style="height: 44px; margin-top: 15px; width: 100%;">
+                                    <i class="fa-solid fa-paper-plane"></i> Lançar Cobrança
+                                </button>
+                            </form>
+                        </section>
+                    </div>
+
+                    <!-- Payment history table for this student -->
+                    <div class="history-table-wrapper glass-panel" style="margin-top: 30px; padding: 25px;">
+                        <h3>Histórico Financeiro do Atleta</h3>
+                        <table class="premium-table">
+                            <thead>
+                                <tr>
+                                    <th>Data Lançamento</th>
+                                    <th>Mês Ref</th>
+                                    <th>Valor</th>
+                                    <th>Status</th>
+                                    <th>Recibo / Comprovante</th>
+                                    <th>Ações</th>
+                                </tr>
+                            </thead>
+                            <tbody id="coach-payments-table-body">
+                                <!-- Populated dynamically -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- 4. MODAL: REGISTER NEW STUDENT -->
+    <div id="register-modal" class="modal-wrapper hidden">
+        <div class="modal-card glass-panel">
+            <div class="modal-header">
+                <h3><i class="fa-solid fa-user-plus text-gold"></i> CADASTRAR NOVO ALUNO</h3>
+                <button class="modal-close-btn" onclick="closeRegisterModal()"><i class="fa-solid fa-xmark"></i></button>
+            </div>
+            <form id="register-student-form">
                 <div class="input-group">
-                    <label for="mob-reg-name">Nome Completo</label>
-                    <input type="text" id="mob-reg-name" required>
+                    <label for="reg-name">Nome Completo</label>
+                    <input type="text" id="reg-name" required>
                 </div>
                 <div class="input-group">
-                    <label for="mob-reg-username">Usuário (Login)</label>
-                    <input type="text" id="mob-reg-username" required autocomplete="username">
+                    <label for="reg-username">Usuário (Usado para Login)</label>
+                    <input type="text" id="reg-username" required autocomplete="username">
                 </div>
                 <div class="input-group">
-                    <label for="mob-reg-password">Senha</label>
-                    <input type="password" id="mob-reg-password" required autocomplete="new-password">
+                    <label for="reg-password">Senha de Acesso</label>
+                    <input type="password" id="reg-password" required autocomplete="new-password">
                 </div>
                 <div class="modal-row-fields">
                     <div class="input-group">
-                        <label for="mob-reg-age">Idade</label>
-                        <input type="number" id="mob-reg-age" required>
+                        <label for="reg-age">Idade</label>
+                        <input type="number" id="reg-age" required>
                     </div>
                     <div class="input-group">
-                        <label for="mob-reg-height">Altura (cm)</label>
-                        <input type="number" id="mob-reg-height" required>
+                        <label for="reg-height">Altura (cm)</label>
+                        <input type="number" id="reg-height" required>
                     </div>
                 </div>
-                <button type="submit" class="btn-primary" style="height: 44px; margin-top: 10px;">CADASTRAR ATLETA</button>
+                <button type="submit" class="btn-primary" style="height: 48px; margin-top: 15px;">
+                    <span>CONCLUIR CADASTRO</span>
+                    <i class="fa-solid fa-circle-check"></i>
+                </button>
             </form>
-        </div>
-    </div>
-
-    <!-- 4. SLIDING BOTTOM DRAWER (COACH STUDENT INSPECTOR) -->
-    <div id="coach-student-drawer" class="bottom-drawer-wrapper hidden">
-        <div class="drawer-overlay" onclick="closeStudentDrawer()"></div>
-        <div class="drawer-content glass-panel">
-            <div class="drawer-handle"></div>
-            <div class="drawer-header">
-                <div style="flex-grow: 1;">
-                    <h3 id="drawer-student-name">Arthur Alves</h3>
-                    <span id="drawer-student-meta" style="font-size: 0.72rem; color: var(--text-secondary);">Idade: 26 | Altura: 178cm</span>
-                    <div class="drawer-quick-actions" style="margin-top: 6px; display: flex; gap: 8px;">
-                        <button id="btn-draw-quick-archive" class="btn-secondary" style="font-size: 0.7rem; padding: 2px 6px; width: auto; height: 24px; display: inline-flex; align-items: center; gap: 4px;">
-                            <i class="fa-solid fa-box-archive"></i> <span id="text-draw-quick-archive">Arquivar</span>
-                        </button>
-                        <button id="btn-draw-quick-trash" class="btn-danger" style="font-size: 0.7rem; padding: 2px 6px; width: auto; height: 24px; display: inline-flex; align-items: center; gap: 4px;">
-                            <i class="fa-solid fa-trash-can"></i> <span id="text-draw-quick-trash">Excluir</span>
-                        </button>
-                    </div>
-                </div>
-                <button class="drawer-close-btn" onclick="closeStudentDrawer()"><i class="fa-solid fa-xmark"></i></button>
-            </div>
-
-            <!-- Drawer Tab controls -->
-            <div class="drawer-tabs">
-                <button class="drawer-tab-btn active" id="btn-draw-eval" onclick="switchDrawerTab('eval')">Avaliação</button>
-                <button class="drawer-tab-btn" id="btn-draw-presc" onclick="switchDrawerTab('presc')">Prescrever</button>
-                <button class="drawer-tab-btn" id="btn-draw-pay" onclick="switchDrawerTab('pay')">Pagamentos</button>
-            </div>
-
-            <!-- Scrollable content inside drawer -->
-            <div class="drawer-body">
-                <!-- Tab: Eval -->
-                <div id="drawer-tab-eval" class="drawer-tab-section">
-                    <!-- Form to allow Coach to register new measurements directly in mobile -->
-                    <div class="mobile-card-form" style="background: rgba(255,255,255,0.02); margin-bottom: 20px; border: 1px solid rgba(255,255,255,0.05); padding: 12px; border-radius: 8px;">
-                        <h4 style="font-size: 0.8rem; margin-bottom: 8px;"><i class="fa-solid fa-circle-plus text-gold"></i> Registrar Medidas</h4>
-                        <form id="coach-mob-measurements-form" class="mobile-metrics-grid">
-                            <div class="input-group">
-                                <label for="coach-mob-metric-weight">Peso (kg)</label>
-                                <input type="number" id="coach-mob-metric-weight" step="0.1" required>
-                            </div>
-                            <div class="input-group">
-                                <label for="coach-mob-metric-bf">BF (%)</label>
-                                <input type="number" id="coach-mob-metric-bf" step="0.1" required>
-                            </div>
-                            <div class="input-group">
-                                <label for="coach-mob-metric-waist">Cintura (cm)</label>
-                                <input type="number" id="coach-mob-metric-waist" step="0.1" required>
-                            </div>
-                            <div class="input-group">
-                                <label for="coach-mob-metric-arms">Braço (cm)</label>
-                                <input type="number" id="coach-mob-metric-arms" step="0.1" required>
-                            </div>
-                            <button type="submit" class="btn-primary" style="grid-column: span 2; height: 32px; font-size: 0.75rem; margin-top: 5px;">
-                                Salvar Medidas
-                            </button>
-                        </form>
-                    </div>
-
-                    <h4>Fotos de Progresso</h4>
-                    <div class="mobile-gallery-wrapper" id="drawer-photos-gallery">
-                        <!-- Populated dynamically -->
-                    </div>
-
-                    <h4 style="margin-top: 20px;">Histórico de Medidas</h4>
-                    <div class="history-list-mobile" id="drawer-metrics-history-list">
-                        <!-- Populated dynamically -->
-                    </div>
-                </div>
-
-                <!-- Tab: Prescribe -->
-                <div id="drawer-tab-presc" class="drawer-tab-section hidden">
-                    <!-- Prescribe Workout Day select -->
-                    <div class="prescription-field-mobile">
-                        <div class="field-row">
-                            <label for="draw-presc-day">Selecione o Dia</label>
-                            <select id="draw-presc-day" class="premium-select-mobile" onchange="loadDrawerWorkoutDay()">
-                                <option value="segunda">SEG</option>
-                                <option value="terca">TER</option>
-                                <option value="quarta">QUA</option>
-                                <option value="quinta">QUI</option>
-                                <option value="sexta">SEX</option>
-                                <option value="sabado">SÁB</option>
-                            </select>
-                        </div>
-                        <label for="draw-presc-focus">Foco do Dia</label>
-                        <input type="text" id="draw-presc-focus" class="premium-input-mobile">
-                        
-                        <label for="draw-presc-exercises" style="margin-top: 8px;">Exercícios (Nome | Séries x Reps)</label>
-                        <textarea id="draw-presc-exercises" class="premium-textarea-mobile" rows="6"></textarea>
-                        <button class="btn-primary" onclick="saveDrawerWorkout()" style="height: 38px; margin-top: 8px;">Salvar Treino deste Dia</button>
-                    </div>
-
-                    <!-- Prescribe Diet -->
-                    <div class="prescription-field-mobile" style="margin-top: 20px; border-top: 1px solid rgba(255,255,255,0.05); padding-top: 15px;">
-                        <label for="draw-presc-diet">Plano Alimentar (Horário | Refeição. Use '---' para separar)</label>
-                        <textarea id="draw-presc-diet" class="premium-textarea-mobile" rows="8"></textarea>
-                        <button class="btn-primary" onclick="saveDrawerDiet()" style="height: 38px; margin-top: 8px;">Salvar Dieta Completa</button>
-                    </div>
-                </div>
-
-                <!-- Tab: Payments -->
-                <div id="drawer-tab-pay" class="drawer-tab-section hidden">
-                    <!-- Config values -->
-                    <div class="prescription-field-mobile">
-                        <label for="draw-student-fee">Valor da Mensalidade (R$)</label>
-                        <input type="number" id="draw-student-fee" class="premium-input-mobile" step="0.01">
-                        
-                        <label for="draw-pix-key" style="margin-top: 8px;">Chave PIX da Assessoria</label>
-                        <input type="text" id="draw-pix-key" class="premium-input-mobile">
-                        
-                        <label for="draw-bank-details" style="margin-top: 8px;">Dados Bancários para Transferência</label>
-                        <input type="text" id="draw-bank-details" class="premium-input-mobile">
-                        
-                        <button class="btn-primary" onclick="saveDrawerPaymentConfig()" style="height: 38px; margin-top: 10px;">Salvar Configurações</button>
-                    </div>
-
-                    <!-- Launch new billing -->
-                    <div class="prescription-field-mobile" style="margin-top: 20px; border-top: 1px solid rgba(255,255,255,0.05); padding-top: 15px;">
-                        <h4 style="font-size: 0.8rem; margin-bottom: 8px;">Lançar Faturamento</h4>
-                        <form id="coach-mob-payment-form">
-                            <label for="draw-payment-month">Mês de Referência (ex: Julho/2026)</label>
-                            <input type="text" id="draw-payment-month" class="premium-input-mobile" required>
-
-                            <label for="draw-payment-amount" style="margin-top: 8px;">Valor Cobrado (R$)</label>
-                            <input type="number" id="draw-payment-amount" class="premium-input-mobile" step="0.01" required>
-
-                            <label for="draw-payment-status" style="margin-top: 8px;">Status Inicial</label>
-                            <select id="draw-payment-status" class="premium-select-mobile" style="width: 100%;">
-                                <option value="Pendente">Pendente</option>
-                                <option value="Pago">Pago</option>
-                            </select>
-
-                            <label style="margin-top: 8px; display: block;">Comprovante (opcional)</label>
-                            <div class="photo-upload-zone-mobile" style="height: auto; padding: 10px; margin-top: 5px;">
-                                <label for="coach-mob-payment-file" class="mob-upload-label">
-                                    <i class="fa-solid fa-cloud-arrow-up text-gold"></i>
-                                    <span id="coach-mob-payment-file-label">Selecionar Imagem</span>
-                                    <input type="file" id="coach-mob-payment-file" accept="image/*" style="display:none;">
-                                </label>
-                            </div>
-
-                            <button type="submit" class="btn-primary" style="height: 38px; margin-top: 12px; width: 100%;">
-                                Lançar Cobrança
-                            </button>
-                        </form>
-                    </div>
-
-                    <!-- Payments list for this student -->
-                    <h4 style="margin-top: 20px; font-size: 0.8rem;">Histórico de Pagamentos</h4>
-                    <div class="history-list-mobile" id="drawer-payments-history-list" style="margin-top: 10px;">
-                        <!-- Populated dynamically -->
-                    </div>
-                </div>
-            </div>
         </div>
     </div>
 
@@ -568,7 +716,7 @@
         </div>
     </div>
 
-    <!-- Script -->
+    <!-- Core Script -->
     <script src="script.js"></script>
 </body>
 </html>
