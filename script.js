@@ -87,9 +87,9 @@ const INITIAL_DB = {
 };
 
 let db = null;
-let currentUser = null; // Currently logged in user object
-let activeDay = "segunda"; // Selected workout tab
-let coachListViewMode = "active"; // "active" | "archived" | "trash"
+let currentUser = null;
+let activeDay = "segunda";
+let coachMobileFilter = "active"; // "active" | "archived" | "trash"
 
 function initDb() {
     const savedDb = localStorage.getItem("team_alves_db");
@@ -97,7 +97,7 @@ function initDb() {
         try {
             db = JSON.parse(savedDb);
         } catch (e) {
-            console.error("Erro ao ler banco de dados, resetando...", e);
+            console.error("Erro ao ler banco de dados no mobile, resetando...", e);
             db = JSON.parse(JSON.stringify(INITIAL_DB));
             saveDb();
         }
@@ -112,7 +112,7 @@ function saveDb() {
 }
 
 // ==========================================
-// 2. CANVAS LIGHTNING ENGINE
+// 2. MOBILE CANVAS LIGHTNING (Optimized for Mobile)
 // ==========================================
 
 const canvas = document.getElementById("lightning-canvas");
@@ -131,7 +131,7 @@ window.addEventListener("resize", () => {
     height = (canvas.height = window.innerHeight);
 });
 
-class Lightning {
+class MobileLightning {
     constructor(startX, startY, endX, endY, isTaskStrike = false) {
         this.startX = startX;
         this.startY = startY;
@@ -140,13 +140,13 @@ class Lightning {
         this.isTaskStrike = isTaskStrike;
         this.points = [];
         this.opacity = 1;
-        this.decay = isTaskStrike ? 0.04 : 0.07;
+        this.decay = isTaskStrike ? 0.05 : 0.09;
         this.generatePath();
     }
 
     generatePath() {
         this.points = [];
-        let steps = 15;
+        let steps = 10;
         let diffX = this.endX - this.startX;
         let diffY = this.endY - this.startY;
 
@@ -156,7 +156,7 @@ class Lightning {
             let py = this.startY + diffY * t;
 
             if (i > 0 && i < steps) {
-                let offset = (Math.random() - 0.5) * (this.isTaskStrike ? 30 : 60) * (1 - Math.abs(t - 0.5) * 0.8);
+                let offset = (Math.random() - 0.5) * (this.isTaskStrike ? 20 : 40) * (1 - Math.abs(t - 0.5) * 0.8);
                 px += offset;
             }
             this.points.push({ x: px, y: py });
@@ -166,14 +166,12 @@ class Lightning {
     draw() {
         if (this.opacity <= 0) return;
 
-        ctx.strokeStyle = `rgba(255, 255, 255, ${this.opacity})`;
-        ctx.shadowColor = this.isTaskStrike ? "rgba(0, 230, 118, 0.8)" : "rgba(255, 215, 0, 0.8)";
         ctx.lineJoin = "round";
 
-        // Draw outer glow (thick)
-        ctx.lineWidth = this.isTaskStrike ? 8 : 12;
-        ctx.shadowBlur = 20;
-        ctx.strokeStyle = this.isTaskStrike ? `rgba(0, 230, 118, ${this.opacity * 0.2})` : `rgba(255, 172, 28, ${this.opacity * 0.25})`;
+        ctx.lineWidth = this.isTaskStrike ? 6 : 9;
+        ctx.shadowBlur = 12;
+        ctx.shadowColor = this.isTaskStrike ? "rgba(0, 230, 118, 0.7)" : "rgba(255, 215, 0, 0.7)";
+        ctx.strokeStyle = this.isTaskStrike ? `rgba(0, 230, 118, ${this.opacity * 0.2})` : `rgba(255, 172, 28, ${this.opacity * 0.2})`;
         ctx.beginPath();
         ctx.moveTo(this.points[0].x, this.points[0].y);
         for (let i = 1; i < this.points.length; i++) {
@@ -181,19 +179,7 @@ class Lightning {
         }
         ctx.stroke();
 
-        // Draw middle glow
-        ctx.lineWidth = this.isTaskStrike ? 4 : 6;
-        ctx.shadowBlur = 10;
-        ctx.strokeStyle = this.isTaskStrike ? `rgba(0, 230, 118, ${this.opacity * 0.6})` : `rgba(255, 215, 0, ${this.opacity * 0.75})`;
-        ctx.beginPath();
-        ctx.moveTo(this.points[0].x, this.points[0].y);
-        for (let i = 1; i < this.points.length; i++) {
-            ctx.lineTo(this.points[i].x, this.points[i].y);
-        }
-        ctx.stroke();
-
-        // Draw white core
-        ctx.lineWidth = 1.5;
+        ctx.lineWidth = 1.2;
         ctx.shadowBlur = 2;
         ctx.strokeStyle = `rgba(255, 255, 255, ${this.opacity})`;
         ctx.beginPath();
@@ -207,15 +193,15 @@ class Lightning {
     }
 }
 
-class Spark {
+class MobileSpark {
     constructor(x, y) {
         this.x = x;
         this.y = y;
-        this.vx = (Math.random() - 0.5) * 3;
-        this.vy = -Math.random() * 2 - 0.5;
-        this.size = Math.random() * 2.5 + 1;
+        this.vx = (Math.random() - 0.5) * 2;
+        this.vy = -Math.random() * 1.5 - 0.5;
+        this.size = Math.random() * 2 + 0.8;
         this.alpha = 1;
-        this.decay = Math.random() * 0.02 + 0.01;
+        this.decay = Math.random() * 0.04 + 0.02;
     }
 
     update() {
@@ -225,51 +211,39 @@ class Spark {
     }
 
     draw() {
-        ctx.save();
         ctx.fillStyle = `rgba(255, 215, 0, ${this.alpha})`;
-        ctx.shadowBlur = 8;
-        ctx.shadowColor = "rgba(255, 215, 0, 0.8)";
         ctx.beginPath();
         ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
         ctx.fill();
-        ctx.restore();
     }
 }
 
-function spawnSparks(x, y, count = 10) {
+function spawnSparks(x, y, count = 6) {
     for (let i = 0; i < count; i++) {
-        ambientSparks.push(new Spark(x, y));
+        ambientSparks.push(new MobileSpark(x, y));
     }
 }
 
 function triggerLightningStrike(x = null, y = null) {
-    let startX = x !== null ? x + (Math.random() - 0.5) * 200 : Math.random() * width;
+    let startX = x !== null ? x + (Math.random() - 0.5) * 100 : Math.random() * width;
     let startY = -10;
     let endX = x !== null ? x : Math.random() * width;
     let endY = y !== null ? y : height * 0.7 + Math.random() * (height * 0.3);
 
-    lightningBolts.push(new Lightning(startX, startY, endX, endY, x !== null && y !== null));
+    lightningBolts.push(new MobileLightning(startX, startY, endX, endY, x !== null && y !== null));
     
     if (x !== null && y !== null) {
-        spawnSparks(endX, endY, 15);
+        spawnSparks(endX, endY, 8);
     }
 }
 
-let mouseX = 0, mouseY = 0, mouseInside = false;
-window.addEventListener("mousemove", (e) => {
-    mouseX = e.clientX;
-    mouseY = e.clientY;
-    mouseInside = true;
-    if (Math.random() < 0.15) {
-        ambientSparks.push(new Spark(mouseX, mouseY));
+window.addEventListener("touchstart", (e) => {
+    const touch = e.touches[0];
+    const target = e.target;
+    if (target.tagName !== "BUTTON" && target.tagName !== "INPUT" && target.tagName !== "TEXTAREA" && !target.closest("button") && !target.closest("nav") && !target.closest("header") && !target.closest(".drawer-content")) {
+        triggerLightningStrike(touch.clientX, touch.clientY);
     }
-});
-
-window.addEventListener("click", (e) => {
-    if (e.target.tagName !== "BUTTON" && e.target.tagName !== "INPUT" && e.target.tagName !== "TEXTAREA" && e.target.tagName !== "SELECT" && !e.target.closest("button") && !e.target.closest(".sidebar") && !e.target.closest(".modal-card")) {
-        triggerLightningStrike(e.clientX, e.clientY);
-    }
-});
+}, { passive: true });
 
 function animate() {
     ctx.clearRect(0, 0, width, height);
@@ -288,7 +262,7 @@ function animate() {
         }
     }
 
-    let strikeChance = isBoostMode ? 0.08 : 0.005;
+    let strikeChance = isBoostMode ? 0.05 : 0.003;
     if (Math.random() < strikeChance) {
         triggerLightningStrike();
     }
@@ -298,13 +272,12 @@ function animate() {
 animate();
 
 // ==========================================
-// 3. LOGIN & AUTHENTICATION ROUTER
+// 3. LOGIN & ROUTER CONTROLLER
 // ==========================================
 
 const loginForm = document.getElementById("login-form");
 const loginWrapper = document.getElementById("login-wrapper");
-const dashboardWrapper = document.getElementById("dashboard-wrapper");
-const coachWrapper = document.getElementById("coach-wrapper");
+const appWrapper = document.getElementById("app-wrapper");
 const flashOverlay = document.getElementById("flash-overlay");
 
 loginForm.addEventListener("submit", (e) => {
@@ -333,17 +306,10 @@ loginForm.addEventListener("submit", (e) => {
             sessionStorage.setItem("team_alves_user", JSON.stringify(user));
             loginWrapper.classList.add("hidden");
             
-            // Clear input fields
             document.getElementById("username").value = "";
             document.getElementById("password").value = "";
 
-            if (user.role === "coach") {
-                coachWrapper.classList.remove("hidden");
-                initCoachDashboard();
-            } else {
-                dashboardWrapper.classList.remove("hidden");
-                initStudentDashboard();
-            }
+            initApp();
 
             triggerLightningStrike(width / 2, height / 2);
             setTimeout(() => {
@@ -351,25 +317,19 @@ loginForm.addEventListener("submit", (e) => {
             }, 150);
         }, 300);
     } else {
-        alert("Credenciais incorretas! Tente novamente.");
+        alert("Dados incorretos!");
     }
 });
 
-// Logout Student
-document.getElementById("student-logout-btn").addEventListener("click", () => logoutUser());
-// Logout Coach
-document.getElementById("coach-logout-btn").addEventListener("click", () => logoutUser());
-
-function logoutUser() {
+const logoutBtn = document.getElementById("logout-btn");
+logoutBtn.addEventListener("click", () => {
     flashOverlay.style.opacity = "1";
     setTimeout(() => {
         currentUser = null;
         sessionStorage.removeItem("team_alves_user");
-        dashboardWrapper.classList.add("hidden");
-        coachWrapper.classList.add("hidden");
+        appWrapper.classList.add("hidden");
         loginWrapper.classList.remove("hidden");
         
-        // Disable boost
         document.body.classList.remove("boost-active");
         isBoostMode = false;
         hasShownRadianteToday = false;
@@ -378,113 +338,134 @@ function logoutUser() {
             flashOverlay.style.opacity = "0";
         }, 150);
     }, 300);
-}
+});
 
-// Auto-Login Session Check on Page Load
+// Auto login Session check
 window.addEventListener("load", () => {
     initDb();
     const activeSession = sessionStorage.getItem("team_alves_user");
     if (activeSession) {
         currentUser = JSON.parse(activeSession);
         loginWrapper.classList.add("hidden");
-        if (currentUser.role === "coach") {
-            coachWrapper.classList.remove("hidden");
-            initCoachDashboard();
-        } else {
-            dashboardWrapper.classList.remove("hidden");
-            initStudentDashboard();
-        }
+        initApp();
     }
 });
 
-// ==========================================
-// 4. STUDENT DASHBOARD CONTROLLER
-// ==========================================
-
-function initStudentDashboard() {
+function initApp() {
     activeDay = "segunda";
+    appWrapper.classList.remove("hidden");
     
-    // Set Navigation active
-    document.getElementById("nav-student-dashboard").classList.add("active");
-    document.getElementById("nav-student-evolution").classList.remove("active");
-    document.getElementById("nav-student-payments").classList.remove("active");
-    document.getElementById("student-dashboard-view").classList.remove("hidden");
-    document.getElementById("student-evolution-view").classList.add("hidden");
-    document.getElementById("student-payments-view").classList.add("hidden");
+    // Toggle bottom navigation bar items depending on role
+    const studentItems = document.querySelectorAll(".student-nav-item");
+    const coachItems = document.querySelectorAll(".coach-nav-item");
 
-    // Display student name and stats
-    document.getElementById("student-display-name").innerText = currentUser.name;
-    document.getElementById("student-display-meta").innerText = `Altura: ${currentUser.height}cm | Idade: ${currentUser.age}`;
-    document.getElementById("welcome-athlete-name").innerText = currentUser.name.split(" ")[0];
-
-    updateDateDisplay("date-display");
-    setupStudentTabs();
-    renderStudentWorkout();
-    renderStudentDiet();
-    calculateStudentEnergy();
-}
-
-function updateDateDisplay(elementId) {
-    const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
-    const todayStr = new Date().toLocaleDateString('pt-BR', options);
-    document.getElementById(elementId).innerText = todayStr.charAt(0).toUpperCase() + todayStr.slice(1);
-}
-
-// Student Tab navigation handlers
-function setupStudentTabs() {
-    // Day tabs switcher
-    const dayTabs = document.querySelectorAll(".tab-btn");
-    dayTabs.forEach(tab => {
-        tab.classList.remove("active");
-        if (tab.dataset.day === activeDay) tab.classList.add("active");
+    if (currentUser.role === "coach") {
+        document.getElementById("app-header-title").innerText = "TEAM ALVES | COACH";
         
-        tab.onclick = () => {
-            dayTabs.forEach(t => t.classList.remove("active"));
-            tab.classList.add("active");
-            activeDay = tab.dataset.day;
+        // Show coach menu items, hide student ones
+        studentItems.forEach(item => item.classList.add("hidden"));
+        coachItems.forEach(item => item.classList.remove("hidden"));
+        
+        coachMobileFilter = "active";
+        const mobileFilter = document.getElementById("coach-mobile-filter");
+        if (mobileFilter) {
+            mobileFilter.value = coachMobileFilter;
+            mobileFilter.onchange = (e) => {
+                coachMobileFilter = e.target.value;
+                renderCoachStudentsList();
+            };
+        }
+        
+        switchTab("coach");
+    } else {
+        document.getElementById("app-header-title").innerText = "TEAM ALVES";
+        
+        studentItems.forEach(item => item.classList.remove("hidden"));
+        coachItems.forEach(item => item.classList.add("hidden"));
+        
+        // Display student specific home info
+        document.getElementById("welcome-athlete-name").innerText = currentUser.name.split(" ")[0];
+        updateDateDisplay();
+        setupStudentTabs();
+        
+        switchTab("home");
+    }
+}
+
+function updateDateDisplay() {
+    const options = { weekday: 'long', day: 'numeric', month: 'short' };
+    const todayStr = new Date().toLocaleDateString('pt-BR', options);
+    document.getElementById("date-display").innerText = todayStr.charAt(0).toUpperCase() + todayStr.slice(1);
+}
+
+// ==========================================
+// 4. BOTTOM NAV TAB SWITCHER (MOBILE ROUTING)
+// ==========================================
+
+window.switchTab = function(tabName) {
+    // Hide all views
+    document.querySelectorAll(".app-view").forEach(view => view.classList.add("hidden"));
+    
+    // Show active view
+    const activeView = document.getElementById(`view-${tabName}`);
+    if (activeView) activeView.classList.remove("hidden");
+
+    // Remove active class from all nav buttons
+    document.querySelectorAll(".nav-btn").forEach(btn => btn.classList.remove("active"));
+    
+    // Set active tab button
+    const activeBtn = document.getElementById(`btn-tab-${tabName}`);
+    if (activeBtn) activeBtn.classList.add("active");
+
+    // Route specific rendering
+    if (currentUser.role === "student") {
+        if (tabName === "home") {
+            calculateStudentEnergy();
+            updateHomeCounters();
+        } else if (tabName === "workout") {
+            renderStudentWorkout();
+        } else if (tabName === "diet") {
+            renderStudentDiet();
+        } else if (tabName === "progress") {
+            renderStudentProgressView();
+        } else if (tabName === "payments") {
+            renderMobilePayments();
+        }
+    } else {
+        if (tabName === "coach") {
+            renderCoachStudentsList();
+        }
+    }
+};
+
+function setupStudentTabs() {
+    const tabBtns = document.querySelectorAll(".day-tab-btn");
+    tabBtns.forEach(btn => {
+        btn.classList.remove("active");
+        if (btn.dataset.day === activeDay) btn.classList.add("active");
+        
+        btn.onclick = () => {
+            tabBtns.forEach(b => b.classList.remove("active"));
+            btn.classList.add("active");
+            activeDay = btn.dataset.day;
             renderStudentWorkout();
             renderStudentDiet();
             calculateStudentEnergy();
+            updateHomeCounters();
         };
     });
-
-    // Subviews switches (Treino/Dieta vs Evolução vs Pagamentos)
-    document.getElementById("nav-student-dashboard").onclick = () => {
-        document.getElementById("nav-student-dashboard").classList.add("active");
-        document.getElementById("nav-student-evolution").classList.remove("active");
-        document.getElementById("nav-student-payments").classList.remove("active");
-        document.getElementById("student-dashboard-view").classList.remove("hidden");
-        document.getElementById("student-evolution-view").classList.add("hidden");
-        document.getElementById("student-payments-view").classList.add("hidden");
-    };
-
-    document.getElementById("nav-student-evolution").onclick = () => {
-        document.getElementById("nav-student-dashboard").classList.remove("active");
-        document.getElementById("nav-student-evolution").classList.add("active");
-        document.getElementById("nav-student-payments").classList.remove("active");
-        document.getElementById("student-dashboard-view").classList.add("hidden");
-        document.getElementById("student-evolution-view").classList.remove("hidden");
-        document.getElementById("student-payments-view").classList.add("hidden");
-        renderStudentEvolution();
-    };
-
-    document.getElementById("nav-student-payments").onclick = () => {
-        document.getElementById("nav-student-dashboard").classList.remove("active");
-        document.getElementById("nav-student-evolution").classList.remove("active");
-        document.getElementById("nav-student-payments").classList.add("active");
-        document.getElementById("student-dashboard-view").classList.add("hidden");
-        document.getElementById("student-evolution-view").classList.add("hidden");
-        document.getElementById("student-payments-view").classList.remove("hidden");
-        renderStudentPayments();
-    };
 }
+
+// ==========================================
+// 5. STUDENT VIEW CONTROLLERS (MOBILE)
+// ==========================================
 
 function renderStudentWorkout() {
     const data = db.studentData[currentUser.id];
     const workoutData = data.workout[activeDay];
     
-    document.getElementById("workout-day-name").innerText = workoutData.name;
     document.getElementById("workout-focus-badge").innerText = workoutData.focus;
+    document.getElementById("workout-day-name").innerText = workoutData.name;
 
     const listContainer = document.getElementById("exercise-list-container");
     listContainer.innerHTML = "";
@@ -505,15 +486,14 @@ function renderStudentWorkout() {
                 <span class="exercise-name">${ex.name}</span>
                 <span class="exercise-details">${ex.details}</span>
             </div>
-            <button class="check-btn" onclick="toggleStudentExercise('${ex.id}', this, event)">
+            <button class="check-btn-mobile" onclick="toggleStudentExercise('${ex.id}', this, event)">
                 <i class="fa-solid ${isCompleted ? 'fa-square-check' : 'fa-square'}"></i>
-                <span>${isCompleted ? 'Objetivo Concluído' : 'Marcar Concluído'}</span>
             </button>
         `;
         listContainer.appendChild(card);
     });
 
-    document.getElementById("workout-count").innerText = `${dayCompletedCount}/${workoutData.exercises.length}`;
+    document.getElementById("workout-overall-badge").innerText = `Progresso: ${dayCompletedCount}/${workoutData.exercises.length}`;
 }
 
 function renderStudentDiet() {
@@ -535,27 +515,28 @@ function renderStudentDiet() {
         const itemsLi = meal.items.map(item => `<li>${item}</li>`).join("");
 
         card.innerHTML = `
-            <div class="meal-header">
-                <div class="meal-title-wrapper">
-                    <span class="meal-time-badge">${meal.time}</span>
-                    <span class="meal-title">${meal.name}</span>
-                </div>
+            <div class="meal-title-row">
+                <span class="meal-title-mobile">${meal.name}</span>
+                <span class="meal-time-badge">${meal.time}</span>
             </div>
-            <ul class="meal-details-list">
+            <ul class="meal-details-list-mobile">
                 ${itemsLi}
             </ul>
-            <button class="check-btn" onclick="toggleStudentMeal('${meal.id}', this, event)">
-                <i class="fa-solid ${isCompleted ? 'fa-square-check' : 'fa-square'}"></i>
-                <span>${isCompleted ? 'Refeição Feita' : 'Marcar Refeição'}</span>
-            </button>
+            <div class="meal-card-footer">
+                <button class="meal-check-btn" onclick="toggleStudentMeal('${meal.id}', this, event)">
+                    <i class="fa-solid ${isCompleted ? 'fa-square-check' : 'fa-square'}"></i>
+                    <span>${isCompleted ? 'Concluída' : 'Marcar Feita'}</span>
+                </button>
+            </div>
         `;
         dietContainer.appendChild(card);
     });
 
-    document.getElementById("diet-count").innerText = `${dietCompletedCount}/${data.diet.length}`;
+    document.getElementById("diet-overall-badge").innerText = `Concluído: ${dietCompletedCount}/${data.diet.length}`;
 }
 
 window.toggleStudentExercise = function(exId, btn, event) {
+    event.stopPropagation();
     const data = db.studentData[currentUser.id];
     const stateKey = `${activeDay}_${exId}`;
     const card = document.getElementById(`card-${stateKey}`);
@@ -566,26 +547,28 @@ window.toggleStudentExercise = function(exId, btn, event) {
 
     if (isCompleted) {
         card.classList.add("completed");
-        btn.innerHTML = `<i class="fa-solid fa-square-check"></i> <span>Objetivo Concluído</span>`;
+        btn.innerHTML = `<i class="fa-solid fa-square-check"></i>`;
         const rect = btn.getBoundingClientRect();
         triggerLightningStrike(rect.left + rect.width / 2, rect.top + rect.height / 2);
     } else {
         card.classList.remove("completed");
-        btn.innerHTML = `<i class="fa-solid fa-square"></i> <span>Marcar Concluído</span>`;
+        btn.innerHTML = `<i class="fa-solid fa-square"></i>`;
     }
 
-    // Refresh count
+    // Refresh workout progress
     const workoutData = data.workout[activeDay];
     let completedCount = 0;
     workoutData.exercises.forEach(ex => {
         if (data.completions[`${activeDay}_${ex.id}`]) completedCount++;
     });
-    document.getElementById("workout-count").innerText = `${completedCount}/${workoutData.exercises.length}`;
+    document.getElementById("workout-overall-badge").innerText = `Progresso: ${completedCount}/${workoutData.exercises.length}`;
 
     calculateStudentEnergy();
+    updateHomeCounters();
 };
 
 window.toggleStudentMeal = function(mealId, btn, event) {
+    event.stopPropagation();
     const data = db.studentData[currentUser.id];
     const stateKey = `${activeDay}_${mealId}`;
     const card = document.getElementById(`card-diet-${stateKey}`);
@@ -596,22 +579,22 @@ window.toggleStudentMeal = function(mealId, btn, event) {
 
     if (isCompleted) {
         card.classList.add("completed");
-        btn.innerHTML = `<i class="fa-solid fa-square-check"></i> <span>Refeição Feita</span>`;
+        btn.innerHTML = `<i class="fa-solid fa-square-check"></i> <span>Concluída</span>`;
         const rect = btn.getBoundingClientRect();
         triggerLightningStrike(rect.left + rect.width / 2, rect.top + rect.height / 2);
     } else {
         card.classList.remove("completed");
-        btn.innerHTML = `<i class="fa-solid fa-square"></i> <span>Marcar Refeição</span>`;
+        btn.innerHTML = `<i class="fa-solid fa-square"></i> <span>Marcar Feita</span>`;
     }
 
-    // Refresh count
     let completedCount = 0;
     data.diet.forEach(m => {
         if (data.completions[`${activeDay}_${m.id}`]) completedCount++;
     });
-    document.getElementById("diet-count").innerText = `${completedCount}/${data.diet.length}`;
+    document.getElementById("diet-overall-badge").innerText = `Concluído: ${completedCount}/${data.diet.length}`;
 
     calculateStudentEnergy();
+    updateHomeCounters();
 };
 
 function calculateStudentEnergy() {
@@ -632,43 +615,39 @@ function calculateStudentEnergy() {
     const totalTasks = workoutData.exercises.length + data.diet.length;
     const pct = totalTasks > 0 ? Math.round((totalCompleted / totalTasks) * 100) : 0;
 
-    // Update UI Progress Bar
-    const fill = document.getElementById("energy-bar-fill");
-    fill.style.width = `${pct}%`;
+    // Update UI progress meter
+    document.getElementById("energy-bar-fill").style.width = `${pct}%`;
     document.getElementById("energy-percentage").innerText = `${pct}%`;
 
     let msg = "";
     if (pct === 0) {
-        msg = "Sem carga. Inicie as tarefas!";
+        msg = "Sem carga. Inicie os treinos!";
     } else if (pct < 35) {
-        msg = "Carga inicial carregando... ⚡";
+        msg = "Bateria iniciando... ⚡";
     } else if (pct < 70) {
-        msg = "Carga média! Foco total! ⚡";
+        msg = "Carga média! Força! ⚡";
     } else if (pct < 100) {
-        msg = "Quase 100%! Energia alta! 🔥";
+        msg = "Falta pouco para carga máxima! 🔥";
     } else {
-        msg = "FORÇA TOTAL! 100% CARREGADO! ⚡🔥";
+        msg = "CARGA TOTAL COMPLETA! ⚡🔥";
         document.body.classList.add("boost-active");
         isBoostMode = true;
-        
+
         if (!hasShownRadianteToday) {
             hasShownRadianteToday = true;
-            
-            // Shake screen
-            const wrapper = document.getElementById("dashboard-wrapper");
-            wrapper.classList.add("shake-screen");
-            setTimeout(() => wrapper.classList.remove("shake-screen"), 600);
 
-            // Show Radiante Overlay
+            const wrapper = document.getElementById("app-wrapper");
+            wrapper.classList.add("shake-screen");
+            setTimeout(() => wrapper.classList.remove("shake-screen"), 500);
+
             const overlay = document.getElementById("radiante-overlay");
             overlay.classList.remove("hidden");
             overlay.style.opacity = "1";
 
-            // Spawns lightning bolts
-            for (let i = 0; i < 6; i++) {
+            for (let i = 0; i < 4; i++) {
                 setTimeout(() => {
                     triggerLightningStrike(Math.random() * width, Math.random() * height);
-                }, i * 120);
+                }, i * 150);
             }
         }
     }
@@ -677,7 +656,7 @@ function calculateStudentEnergy() {
         document.body.classList.remove("boost-active");
         isBoostMode = false;
         hasShownRadianteToday = false;
-        
+
         const overlay = document.getElementById("radiante-overlay");
         if (!overlay.classList.contains("hidden")) {
             overlay.classList.add("hidden");
@@ -692,12 +671,30 @@ window.closeRadianteOverlay = function() {
     overlay.style.opacity = "0";
     setTimeout(() => {
         overlay.classList.add("hidden");
-    }, 500);
+    }, 400);
 };
 
-// Reset Button Student
+function updateHomeCounters() {
+    const data = db.studentData[currentUser.id];
+    const workoutData = data.workout[activeDay];
+    
+    let completedExercisesNum = 0;
+    workoutData.exercises.forEach(ex => {
+        if (data.completions[`${activeDay}_${ex.id}`]) completedExercisesNum++;
+    });
+
+    let completedMealsNum = 0;
+    data.diet.forEach(m => {
+        if (data.completions[`${activeDay}_${m.id}`]) completedMealsNum++;
+    });
+
+    document.getElementById("home-workout-progress").innerText = `${completedExercisesNum}/${workoutData.exercises.length}`;
+    document.getElementById("home-diet-progress").innerText = `${completedMealsNum}/${data.diet.length}`;
+}
+
+// Student Reset Button
 document.getElementById("reset-progress-btn").addEventListener("click", () => {
-    if (confirm("Resetar todo o progresso de treino e dieta de hoje?")) {
+    if (confirm("Resetar progresso de treino e refeições de hoje?")) {
         const data = db.studentData[currentUser.id];
         const workoutData = data.workout[activeDay];
         
@@ -713,222 +710,185 @@ document.getElementById("reset-progress-btn").addEventListener("click", () => {
         renderStudentWorkout();
         renderStudentDiet();
         calculateStudentEnergy();
-        spawnSparks(width / 2, height / 2, 20);
+        updateHomeCounters();
+
+        spawnSparks(width / 2, height / 2, 12);
     }
 });
 
 // ==========================================
-// 5. STUDENT EVOLUTION SUBVIEW
+// 6. STUDENT EVOLUTION SUBVIEW (MOBILE)
 // ==========================================
 
-function renderStudentEvolution() {
+function renderStudentProgressView() {
     const data = db.studentData[currentUser.id];
     
-    // 1. Render Metrics Table
-    const tableBody = document.getElementById("student-metrics-table-body");
-    tableBody.innerHTML = "";
+    // Render photos
+    renderMobilePhotosGallery(data.photos, "mobile-photos-gallery", true);
 
-    // Show from newest to oldest
+    // Render metrics list (vertical cards instead of table to fit mobile)
+    const historyList = document.getElementById("mobile-metrics-history-list");
+    historyList.innerHTML = "";
+
     const sortedMeasures = [...data.measurements].reverse();
+    if (sortedMeasures.length === 0) {
+        historyList.innerHTML = `<p style="color: var(--text-muted); text-align: center; padding: 20px 0;">Sem avaliações registradas.</p>`;
+        return;
+    }
 
     sortedMeasures.forEach((m) => {
-        const row = document.createElement("tr");
-        row.innerHTML = `
-            <td>${formatDate(m.date)}</td>
-            <td><strong>${m.weight} kg</strong></td>
-            <td>${m.bf}%</td>
-            <td>${m.waist} cm</td>
-            <td>${m.arms} cm</td>
-            <td>${m.legs} cm</td>
+        const card = document.createElement("div");
+        card.className = "metric-history-card";
+        card.innerHTML = `
+            <div class="metric-history-header">
+                <span>${formatDate(m.date)}</span>
+                <strong>Peso: ${m.weight} kg</strong>
+            </div>
+            <div class="metric-history-grid">
+                <div class="metric-history-item"><span>BF</span><strong>${m.bf}%</strong></div>
+                <div class="metric-history-item"><span>Cintura</span><strong>${m.waist}cm</strong></div>
+                <div class="metric-history-item"><span>Braço</span><strong>${m.arms}cm</strong></div>
+                <div class="metric-history-item"><span>Coxa</span><strong>${m.legs}cm</strong></div>
+            </div>
         `;
-        tableBody.appendChild(row);
+        historyList.appendChild(card);
     });
-
-    // 2. Render Photos Gallery
-    renderPhotosGallery(data.photos, "student-photos-gallery", true);
 }
 
 function formatDate(dateStr) {
     const parts = dateStr.split("-");
-    if (parts.length === 3) {
-        return `${parts[2]}/${parts[1]}/${parts[0]}`;
-    }
+    if (parts.length === 3) return `${parts[2]}/${parts[1]}`;
     return dateStr;
 }
 
-function renderPhotosGallery(photosList, containerId, allowDelete) {
+function renderMobilePhotosGallery(photos, containerId, allowDelete) {
     const container = document.getElementById(containerId);
     container.innerHTML = "";
 
-    if (photosList.length === 0) {
-        container.innerHTML = `<p style="grid-column: span 2; color: var(--text-muted); text-align: center; padding: 40px 0;">Nenhuma foto cadastrada ainda.</p>`;
+    if (photos.length === 0) {
+        container.innerHTML = `<p style="color: var(--text-muted); text-align: center; width: 100%; padding: 20px 0; font-size: 0.78rem;">Nenhuma foto cadastrada.</p>`;
         return;
     }
 
-    photosList.forEach((photo, idx) => {
+    photos.forEach((photo, idx) => {
         const card = document.createElement("div");
         card.className = "photo-card";
         card.innerHTML = `
             <img src="${photo.src}" alt="Evolução">
             <span class="photo-card-date">${formatDate(photo.date)}</span>
-            ${allowDelete ? `<button class="photo-delete-btn" onclick="deleteStudentPhoto(${idx})"><i class="fa-solid fa-trash"></i></button>` : ''}
+            ${allowDelete ? `<button class="photo-delete-btn" onclick="deleteMobilePhoto(${idx})"><i class="fa-solid fa-trash"></i></button>` : ''}
         `;
         container.appendChild(card);
     });
 }
 
-// Record new measurements
-const measurementsForm = document.getElementById("measurements-form");
-measurementsForm.addEventListener("submit", (e) => {
+// Save measurements (mobile)
+const mobMetricsForm = document.getElementById("mobile-metrics-form");
+mobMetricsForm.addEventListener("submit", (e) => {
     e.preventDefault();
     const data = db.studentData[currentUser.id];
 
-    const newMeasure = {
+    data.measurements.push({
         date: new Date().toISOString().split("T")[0],
-        weight: parseFloat(document.getElementById("metric-weight").value),
-        bf: parseFloat(document.getElementById("metric-bf").value),
-        chest: parseFloat(document.getElementById("metric-chest").value),
-        waist: parseFloat(document.getElementById("metric-waist").value),
-        arms: parseFloat(document.getElementById("metric-arms").value),
-        legs: parseFloat(document.getElementById("metric-legs").value)
-    };
+        weight: parseFloat(document.getElementById("mob-weight").value),
+        bf: parseFloat(document.getElementById("mob-bf").value),
+        waist: parseFloat(document.getElementById("mob-waist").value),
+        arms: parseFloat(document.getElementById("mob-arms").value),
+        chest: 0, legs: 0 // Default values for mobile simplified layout
+    });
 
-    data.measurements.push(newMeasure);
     saveDb();
-    
-    // Clear inputs
-    measurementsForm.reset();
-    
-    renderStudentEvolution();
-    spawnSparks(width / 2, height / 2, 15);
-    alert("Avaliação registrada com sucesso!");
+    mobMetricsForm.reset();
+    renderStudentProgressView();
+    spawnSparks(width / 2, height / 2, 12);
+    alert("Avaliação física salva!");
 });
 
-// File Photo Upload
-const photoFileInput = document.getElementById("photo-file-input");
-photoFileInput.addEventListener("change", (e) => {
+// Photo upload (mobile)
+const mobPhotoInput = document.getElementById("mob-photo-input");
+mobPhotoInput.addEventListener("change", (e) => {
     const file = e.target.files[0];
     if (!file) return;
-
-    if (!file.type.startsWith("image/")) {
-        alert("Por favor, selecione um arquivo de imagem válido.");
-        return;
-    }
 
     const reader = new FileReader();
     reader.onload = (event) => {
         const data = db.studentData[currentUser.id];
-        const base64Img = event.target.result;
-
         data.photos.push({
             date: new Date().toISOString().split("T")[0],
-            src: base64Img
+            src: event.target.result
         });
-
         saveDb();
-        renderStudentEvolution();
-        spawnSparks(width / 2, height / 2, 15);
+        renderStudentProgressView();
+        spawnSparks(width / 2, height / 2, 10);
     };
     reader.readAsDataURL(file);
 });
 
-window.deleteStudentPhoto = function(index) {
-    if (confirm("Deseja realmente excluir esta foto?")) {
+window.deleteMobilePhoto = function(index) {
+    if (confirm("Deseja excluir esta foto?")) {
         const data = db.studentData[currentUser.id];
         data.photos.splice(index, 1);
         saveDb();
-        renderStudentEvolution();
+        renderStudentProgressView();
     }
 };
 
 // ==========================================
-// 5.5 STUDENT PAYMENTS SUBVIEW
+// 6.5 STUDENT PAYMENTS SUBVIEW (MOBILE)
 // ==========================================
 
-window.renderStudentPayments = function() {
+window.renderMobilePayments = function() {
     const data = db.studentData[currentUser.id];
-    
-    // 1. Render Basic Config
-    document.getElementById("student-fee-value").innerText = `R$ ${parseFloat(data.monthlyFee || 150).toFixed(2).replace('.', ',')}`;
-    document.getElementById("student-pix-key").innerText = data.pixKey || "pix@teamalves.com.br";
-    document.getElementById("student-bank-details").innerText = data.bankDetails || "Banco Itaú - Ag 1234 - CC 56789-0";
 
-    // 2. Render Virtual Card Details
-    const cardForm = document.getElementById("card-form-wrapper");
-    const cardDisplay = document.getElementById("card-registered-display");
-    
+    // 1. Render Basic Values
+    document.getElementById("mob-student-fee-value").innerText = `R$ ${parseFloat(data.monthlyFee || 150).toFixed(2).replace('.', ',')}`;
+    document.getElementById("mob-student-pix-key").innerText = data.pixKey || "pix@teamalves.com.br";
+    document.getElementById("mob-student-bank-details").innerText = data.bankDetails || "Banco Itaú - Ag 1234 - CC 56789-0";
+
+    // 2. Render Credit Card Details
+    const cardForm = document.getElementById("mob-card-form-wrapper");
+    const cardDisplay = document.getElementById("mob-card-registered-display");
+
     if (data.cardDetails) {
         cardForm.classList.add("hidden");
         cardDisplay.classList.remove("hidden");
-        
-        // Mask card number
+
         const rawNum = data.cardDetails.cardNumber.replace(/\s/g, '');
         const last4 = rawNum.slice(-4);
-        document.getElementById("registered-card-number").innerText = `**** **** **** ${last4}`;
-        document.getElementById("registered-card-holder").innerText = data.cardDetails.holderName;
-        document.getElementById("registered-card-expiry").innerText = data.cardDetails.expiryDate;
+        document.getElementById("mob-registered-card-number").innerText = `**** **** **** ${last4}`;
+        document.getElementById("mob-registered-card-holder").innerText = data.cardDetails.holderName.toUpperCase();
+        document.getElementById("mob-registered-card-expiry").innerText = data.cardDetails.expiryDate;
     } else {
         cardForm.classList.remove("hidden");
         cardDisplay.classList.add("hidden");
-        document.getElementById("credit-card-form").reset();
+        document.getElementById("mob-credit-card-form").reset();
     }
 
-    // 3. Render Payments History Table
-    const tableBody = document.getElementById("student-payments-table-body");
-    tableBody.innerHTML = "";
+    // 3. Render Status alert card
+    const statusCard = document.getElementById("mob-payment-status-card");
+    const statusTitle = document.getElementById("mob-payment-status-title");
+    const statusDesc = document.getElementById("mob-payment-status-desc");
 
-    const sortedPayments = [...(data.payments || [])].reverse();
-    
-    sortedPayments.forEach((pay) => {
-        const row = document.createElement("tr");
-        
-        // Status Badge HTML
-        const statusClass = pay.status.toLowerCase() === 'pago' ? 'pago' : 'pendente';
-        const badgeHTML = `<span class="status-badge ${statusClass}">${pay.status}</span>`;
-
-        // Proof View Button HTML
-        let proofHTML = `<span style="color:var(--text-muted); font-size:0.75rem;">Sem anexo</span>`;
-        if (pay.attachmentSrc) {
-            proofHTML = `<button class="btn-view-proof" onclick="viewPaymentAttachment('${currentUser.id}', '${pay.id}')">
-                            <i class="fa-solid fa-receipt"></i> Ver Recibo
-                         </button>`;
-        }
-
-        row.innerHTML = `
-            <td><strong>${pay.monthRef}</strong></td>
-            <td>R$ ${parseFloat(pay.amount).toFixed(2).replace('.', ',')}</td>
-            <td>${badgeHTML}</td>
-            <td>${proofHTML}</td>
-        `;
-        tableBody.appendChild(row);
-    });
-
-    // 4. Update Current Month Payment Status Box
-    const statusCard = document.getElementById("payment-status-card");
-    const statusTitle = document.getElementById("payment-status-title");
-    const statusDesc = document.getElementById("payment-status-desc");
-
-    // Check if there is any pending payment
     const pendingPay = (data.payments || []).find(p => p.status.toLowerCase() === 'pendente');
-    
+
     if (pendingPay) {
-        statusCard.className = "payment-status-alert";
-        statusTitle.innerText = `Status: Pendente (${pendingPay.monthRef})`;
-        statusDesc.innerText = `Aguardando pagamento no valor de R$ ${parseFloat(pendingPay.amount).toFixed(2).replace('.', ',')}. Use PIX ou cadastre seu cartão acima.`;
+        statusCard.className = "payment-status-alert-mobile glass-panel";
+        statusTitle.innerText = `Mensalidade: Pendente (${pendingPay.monthRef})`;
+        statusDesc.innerText = `Lançado no valor de R$ ${parseFloat(pendingPay.amount).toFixed(2).replace('.', ',')}.`;
     } else {
-        statusCard.className = "payment-status-alert paid";
-        statusTitle.innerText = "Status: Regularizado 🟢";
-        statusDesc.innerText = "Todas as suas mensalidades registradas estão pagas. Bom treino!";
+        statusCard.className = "payment-status-alert-mobile paid glass-panel";
+        statusTitle.innerText = "Mensalidade: Regularizada 🟢";
+        statusDesc.innerText = "Nenhuma pendência ativa para este mês.";
     }
 
-    // 5. Populate Upload Selector with Pending Months
-    const monthSelect = document.getElementById("proof-month-select");
+    // 4. Fill upload selector with pending months
+    const monthSelect = document.getElementById("mob-proof-month-select");
     monthSelect.innerHTML = "";
 
     const pendingMonths = (data.payments || []).filter(p => p.status.toLowerCase() === 'pendente');
     
     if (pendingMonths.length === 0) {
-        monthSelect.innerHTML = `<option value="">Nenhuma cobrança pendente</option>`;
+        monthSelect.innerHTML = `<option value="">Nenhuma pendência</option>`;
     } else {
         pendingMonths.forEach((p) => {
             const opt = document.createElement("option");
@@ -937,68 +897,106 @@ window.renderStudentPayments = function() {
             monthSelect.appendChild(opt);
         });
     }
+
+    // 5. Render mobile payments list
+    const list = document.getElementById("mobile-payments-history-list");
+    list.innerHTML = "";
+
+    const sortedPayments = [...(data.payments || [])].reverse();
+
+    if (sortedPayments.length === 0) {
+        list.innerHTML = `<p style="color: var(--text-muted); text-align: center; padding: 20px 0; font-size: 0.75rem;">Sem histórico de pagamentos.</p>`;
+        return;
+    }
+
+    sortedPayments.forEach((pay) => {
+        const item = document.createElement("div");
+        item.className = "payment-list-item-mobile glass-panel";
+
+        const statusClass = pay.status.toLowerCase() === 'pago' ? 'pago' : 'pendente';
+        const badgeHTML = `<span class="status-badge ${statusClass}">${pay.status}</span>`;
+
+        let attachmentBtnHTML = "";
+        if (pay.attachmentSrc) {
+            attachmentBtnHTML = `
+                <button class="btn-view-proof" onclick="viewPaymentAttachment('${currentUser.id}', '${pay.id}')">
+                    <i class="fa-solid fa-receipt"></i> Recibo
+                </button>
+            `;
+        }
+
+        item.innerHTML = `
+            <div class="payment-item-info-mobile">
+                <h4>Cobrança ${pay.monthRef}</h4>
+                <span style="font-size:0.7rem; color:var(--text-secondary);">
+                    Vencimento: ${formatDate(pay.date || new Date().toISOString().split("T")[0])} | 
+                    <strong>R$ ${parseFloat(pay.amount).toFixed(2).replace('.', ',')}</strong>
+                </span>
+            </div>
+            <div style="display:flex; flex-direction:column; align-items:flex-end; gap:6px;">
+                ${badgeHTML}
+                ${attachmentBtnHTML}
+            </div>
+        `;
+        list.appendChild(item);
+    });
 };
 
 window.copyPixKey = function() {
-    const key = document.getElementById("student-pix-key").innerText;
+    const key = document.getElementById("mob-student-pix-key").innerText;
     navigator.clipboard.writeText(key).then(() => {
-        alert("Chave Pix copiada com sucesso!");
+        alert("Chave Pix copiada!");
     }).catch(err => {
-        console.error("Erro ao copiar: ", err);
         alert("Chave Pix: " + key);
     });
 };
 
-// Credit card registration listener
-document.getElementById("credit-card-form").addEventListener("submit", (e) => {
+// Credit Card Submit
+document.getElementById("mob-credit-card-form").addEventListener("submit", (e) => {
     e.preventDefault();
     const data = db.studentData[currentUser.id];
 
     data.cardDetails = {
-        cardNumber: document.getElementById("card-num").value.trim(),
-        holderName: document.getElementById("card-name").value.trim(),
-        expiryDate: document.getElementById("card-expiry").value.trim(),
-        cvv: document.getElementById("card-cvv").value.trim()
+        cardNumber: document.getElementById("mob-card-num").value.trim(),
+        holderName: document.getElementById("mob-card-name").value.trim(),
+        expiryDate: document.getElementById("mob-card-expiry").value.trim(),
+        cvv: document.getElementById("mob-card-cvv").value.trim()
     };
 
     const pendingPayIndex = (data.payments || []).findIndex(p => p.status.toLowerCase() === 'pendente');
     if (pendingPayIndex !== -1) {
         data.payments[pendingPayIndex].status = "Pago";
         data.payments[pendingPayIndex].date = new Date().toISOString().split("T")[0];
-        alert("Cartão cadastrado! A mensalidade pendente foi debitada automaticamente.");
+        alert("Cartão cadastrado! Mensalidade debitada automaticamente.");
     } else {
-        alert("Cartão de crédito cadastrado com sucesso para cobranças recorrentes!");
+        alert("Cartão cadastrado com sucesso!");
     }
 
     saveDb();
-    renderStudentPayments();
-    spawnSparks(width / 2, height / 2, 20);
+    renderMobilePayments();
+    spawnSparks(width / 2, height / 2, 15);
 });
 
 window.deleteStudentCard = function() {
-    if (confirm("Tem certeza que deseja remover o cartão de crédito cadastrado?")) {
+    if (confirm("Remover cartão de crédito cadastrado?")) {
         const data = db.studentData[currentUser.id];
         data.cardDetails = null;
         saveDb();
-        renderStudentPayments();
+        renderMobilePayments();
     }
 };
 
-// Proof Upload
-const proofFileInput = document.getElementById("proof-file-input");
-proofFileInput.addEventListener("change", (e) => {
+// Mobile Proof Upload
+const mobProofFileInput = document.getElementById("mob-proof-file-input");
+mobProofFileInput.addEventListener("change", (e) => {
     const file = e.target.files[0];
-    const paymentId = document.getElementById("proof-month-select").value;
+    const paymentId = document.getElementById("mob-proof-month-select").value;
 
     if (!paymentId) {
-        alert("Por favor, certifique-se de que há uma mensalidade pendente selecionada.");
+        alert("Nenhuma pendência selecionada.");
         return;
     }
     if (!file) return;
-    if (!file.type.startsWith("image/")) {
-        alert("Por favor, selecione um arquivo de imagem válido (JPEG/PNG).");
-        return;
-    }
 
     const reader = new FileReader();
     reader.onload = (event) => {
@@ -1011,17 +1009,17 @@ proofFileInput.addEventListener("change", (e) => {
             payment.attachmentSrc = base64Img;
             payment.status = "Pago";
             payment.date = new Date().toISOString().split("T")[0];
-            
+
             saveDb();
-            renderStudentPayments();
-            spawnSparks(width / 2, height / 2, 20);
-            alert("Comprovante enviado com sucesso! Mensalidade marcada como paga.");
+            renderMobilePayments();
+            spawnSparks(width / 2, height / 2, 15);
+            alert("Comprovante enviado!");
         }
     };
     reader.readAsDataURL(file);
 });
 
-// Attachment Viewer
+// Mobile Attachment Viewer
 window.viewPaymentAttachment = function(studentId, paymentId) {
     const studentData = db.studentData[studentId];
     if (!studentData) return;
@@ -1034,8 +1032,8 @@ window.viewPaymentAttachment = function(studentId, paymentId) {
     overlay.style.left = "0";
     overlay.style.width = "100%";
     overlay.style.height = "100%";
-    overlay.style.backgroundColor = "rgba(0,0,0,0.85)";
-    overlay.style.zIndex = "20000";
+    overlay.style.backgroundColor = "rgba(0,0,0,0.95)";
+    overlay.style.zIndex = "25000";
     overlay.style.display = "flex";
     overlay.style.flexDirection = "column";
     overlay.style.justifyContent = "center";
@@ -1044,23 +1042,23 @@ window.viewPaymentAttachment = function(studentId, paymentId) {
 
     const img = document.createElement("img");
     img.src = payment.attachmentSrc;
-    img.style.maxWidth = "90%";
-    img.style.maxHeight = "80%";
+    img.style.maxWidth = "95%";
+    img.style.maxHeight = "75%";
     img.style.border = "2px solid var(--gold)";
     img.style.borderRadius = "8px";
-    img.style.boxShadow = "0 0 25px rgba(255,215,0,0.3)";
 
     const title = document.createElement("h3");
-    title.innerText = `Comprovante - ${payment.monthRef}`;
+    title.innerText = `Comprovante: ${payment.monthRef}`;
     title.style.color = "var(--gold)";
-    title.style.marginBottom = "15px";
+    title.style.marginBottom = "10px";
+    title.style.fontSize = "1rem";
     title.style.fontFamily = "Orbitron";
 
     const closeTxt = document.createElement("p");
-    closeTxt.innerText = "Clique em qualquer lugar para fechar";
+    closeTxt.innerText = "Toque para fechar";
     closeTxt.style.color = "var(--text-secondary)";
     closeTxt.style.marginTop = "15px";
-    closeTxt.style.fontSize = "0.8rem";
+    closeTxt.style.fontSize = "0.75rem";
 
     overlay.appendChild(title);
     overlay.appendChild(img);
@@ -1069,37 +1067,12 @@ window.viewPaymentAttachment = function(studentId, paymentId) {
 };
 
 // ==========================================
-// 6. COACH PORTAL CONTROLLER
+// 7. COACH PORTAL - STUDENTS LIST (MOBILE)
 // ==========================================
 
-let activeInspectedStudentId = null;
-
-function initCoachDashboard() {
-    updateDateDisplay("coach-date-display");
-    document.getElementById("nav-coach-students").classList.add("active");
-    const archivedBtn = document.getElementById("nav-coach-archived");
-    if (archivedBtn) archivedBtn.classList.remove("active");
-    const trashBtn = document.getElementById("nav-coach-trash");
-    if (trashBtn) trashBtn.classList.remove("active");
-    coachListViewMode = "active";
-    backToStudentsList();
-    renderCoachStudentsList();
-}
-
 function renderCoachStudentsList() {
-    const grid = document.getElementById("coach-students-grid");
-    grid.innerHTML = "";
-
-    const titleEl = document.getElementById("coach-section-title");
-    if (titleEl) {
-        if (coachListViewMode === "active") {
-            titleEl.innerHTML = `<i class="fa-solid fa-users text-gold"></i> Meus Alunos`;
-        } else if (coachListViewMode === "archived") {
-            titleEl.innerHTML = `<i class="fa-solid fa-box-archive text-gold"></i> Alunos Arquivados`;
-        } else if (coachListViewMode === "trash") {
-            titleEl.innerHTML = `<i class="fa-solid fa-trash-can text-gold"></i> Lixeira de Alunos`;
-        }
-    }
+    const container = document.getElementById("coach-students-list-container");
+    container.innerHTML = "";
 
     const students = db.users.filter(u => u.role === "student");
 
@@ -1108,22 +1081,21 @@ function renderCoachStudentsList() {
         if (!data) return;
 
         // Apply filters based on view mode
-        if (coachListViewMode === "active") {
+        if (coachMobileFilter === "active") {
             if (data.isArchived || data.isDeleted) return;
-        } else if (coachListViewMode === "archived") {
+        } else if (coachMobileFilter === "archived") {
             if (!data.isArchived || data.isDeleted) return;
-        } else if (coachListViewMode === "trash") {
+        } else if (coachMobileFilter === "trash") {
             if (!data.isDeleted) return;
         }
 
         const workoutData = data.workout[activeDay];
         
-        // Calculate student's progress today
         let completedExercisesNum = 0;
         workoutData.exercises.forEach(ex => {
             if (data.completions[`${activeDay}_${ex.id}`]) completedExercisesNum++;
         });
-        
+
         let completedMealsNum = 0;
         data.diet.forEach(m => {
             if (data.completions[`${activeDay}_${m.id}`]) completedMealsNum++;
@@ -1133,57 +1105,27 @@ function renderCoachStudentsList() {
         const totalTasks = workoutData.exercises.length + data.diet.length;
         const pct = totalTasks > 0 ? Math.round((totalCompleted / totalTasks) * 100) : 0;
 
-        // Get latest weight record
         const latestWeight = data.measurements.length > 0 ? `${data.measurements[data.measurements.length-1].weight} kg` : "N/D";
-        const latestBf = data.measurements.length > 0 ? `${data.measurements[data.measurements.length-1].bf}%` : "N/D";
 
         const card = document.createElement("div");
-        card.className = "student-card glass-panel";
+        card.className = "student-list-item-mobile glass-panel";
         
-        // If not in trash, allow inspecting the student by clicking the card
-        if (coachListViewMode !== "trash") {
-            card.onclick = (e) => {
-                if (e.target.closest("button")) return; // Don't inspect if an action button was clicked
-                inspectStudent(student.id);
-            };
+        if (coachMobileFilter !== "trash") {
+            card.onclick = () => openStudentDrawer(student.id);
             card.style.cursor = "pointer";
         } else {
             card.style.cursor = "default";
         }
 
         let actionsHTML = "";
-        if (coachListViewMode === "active") {
+        if (coachMobileFilter === "trash") {
             actionsHTML = `
-                <div class="student-card-actions">
-                    <button class="student-card-btn card-action-btn" onclick="inspectStudent('${student.id}')">AVALIAR ATLETA</button>
-                    <button class="btn-secondary card-icon-btn" onclick="event.stopPropagation(); archiveStudent('${student.id}')" title="Arquivar Aluno">
-                        <i class="fa-solid fa-box-archive"></i>
-                    </button>
-                    <button class="btn-danger card-icon-btn" onclick="event.stopPropagation(); deleteStudent('${student.id}')" title="Mover para Lixeira">
-                        <i class="fa-solid fa-trash-can"></i>
-                    </button>
-                </div>
-            `;
-        } else if (coachListViewMode === "archived") {
-            actionsHTML = `
-                <div class="student-card-actions">
-                    <button class="student-card-btn card-action-btn" onclick="inspectStudent('${student.id}')">AVALIAR ATLETA</button>
-                    <button class="btn-secondary card-icon-btn" onclick="event.stopPropagation(); unarchiveStudent('${student.id}')" title="Desarquivar Aluno">
-                        <i class="fa-solid fa-box-open"></i>
-                    </button>
-                    <button class="btn-danger card-icon-btn" onclick="event.stopPropagation(); deleteStudent('${student.id}')" title="Mover para Lixeira">
-                        <i class="fa-solid fa-trash-can"></i>
-                    </button>
-                </div>
-            `;
-        } else if (coachListViewMode === "trash") {
-            actionsHTML = `
-                <div class="student-card-actions split">
-                    <button class="btn-success card-action-btn" onclick="event.stopPropagation(); restoreStudent('${student.id}')" title="Restaurar Aluno">
+                <div style="display:flex; gap:8px; margin-top:10px; padding-top:10px; border-top:1px solid rgba(255,255,255,0.05);">
+                    <button class="btn-primary" onclick="event.stopPropagation(); restoreStudent('${student.id}')" style="flex:1; height:30px; font-size:0.7rem; padding:0; background: var(--green-electric); color:#000;">
                         <i class="fa-solid fa-trash-arrow-up"></i> RESTAURAR
                     </button>
-                    <button class="btn-danger card-action-btn" onclick="event.stopPropagation(); destroyStudentPermanently('${student.id}')" title="Excluir Definitivamente">
-                        <i class="fa-solid fa-circle-xmark"></i> EXCLUIR DEFINITIVO
+                    <button class="btn-danger" onclick="event.stopPropagation(); destroyStudentPermanently('${student.id}')" style="flex:1; height:30px; font-size:0.7rem; padding:0;">
+                        <i class="fa-solid fa-circle-xmark"></i> EXCLUIR
                     </button>
                 </div>
             `;
@@ -1193,178 +1135,181 @@ function renderCoachStudentsList() {
             <div class="student-card-header">
                 <div class="student-card-avatar"><i class="fa-solid fa-user-ninja"></i></div>
                 <div class="student-card-info">
-                    <h3>${student.name}</h3>
-                    <span>Peso: ${latestWeight} | BF: ${latestBf}</span>
+                    <h3 style="font-size:0.95rem;">${student.name}</h3>
+                    <span style="font-size:0.68rem; color:var(--text-secondary);">Peso: ${latestWeight} | Bateria: ${pct}%</span>
                 </div>
             </div>
             <div class="student-card-progress">
-                <div class="student-card-progress-label">
-                    <span>Carga de Hoje</span>
-                    <span>${pct}%</span>
-                </div>
-                <div class="student-card-progress-bar">
+                <div class="student-card-progress-bar" style="height:6px;">
                     <div class="student-card-progress-fill" style="width: ${pct}%"></div>
                 </div>
             </div>
             ${actionsHTML}
         `;
-        grid.appendChild(card);
+        container.appendChild(card);
     });
 }
 
-function backToStudentsList() {
-    document.getElementById("coach-students-list-view").classList.remove("hidden");
-    document.getElementById("coach-student-inspector-view").classList.add("hidden");
-    activeInspectedStudentId = null;
-    renderCoachStudentsList();
-}
+// ==========================================
+// 8. COACH STUDENT DRAWER (BOTTOM OVERLAY PANEL)
+// ==========================================
 
-function inspectStudent(studentId) {
-    activeInspectedStudentId = studentId;
+let activeDrawerStudentId = null;
+let activeDrawerPrescDay = "segunda";
+
+function openStudentDrawer(studentId) {
+    activeDrawerStudentId = studentId;
+    activeDrawerPrescDay = "segunda";
     
-    document.getElementById("coach-students-list-view").classList.add("hidden");
-    document.getElementById("coach-student-inspector-view").classList.remove("hidden");
-
     const studentUser = db.users.find(u => u.id === studentId);
     const data = db.studentData[studentId];
-
-    document.getElementById("inspector-student-name").innerText = studentUser.name;
-    document.getElementById("inspector-student-meta").innerText = `Idade: ${studentUser.age} anos | Altura: ${studentUser.height}cm`;
-
-    // Configure quick actions in inspector header
-    const quickArchiveBtn = document.getElementById("btn-quick-archive");
-    const quickTrashBtn = document.getElementById("btn-quick-trash");
     
+    document.getElementById("drawer-student-name").innerText = studentUser.name;
+    document.getElementById("drawer-student-meta").innerText = `Idade: ${studentUser.age} | Altura: ${studentUser.height}cm`;
+
+    // Configure quick actions in drawer header
+    const quickArchiveBtn = document.getElementById("btn-draw-quick-archive");
+    const quickTrashBtn = document.getElementById("btn-draw-quick-trash");
+
     if (quickArchiveBtn) {
         if (data && data.isArchived) {
-            quickArchiveBtn.innerHTML = `<i class="fa-solid fa-box-open"></i> <span id="text-quick-archive">Desarquivar</span>`;
+            quickArchiveBtn.innerHTML = `<i class="fa-solid fa-box-open"></i> <span id="text-draw-quick-archive">Desarquivar</span>`;
             quickArchiveBtn.onclick = () => {
                 unarchiveStudent(studentId);
-                inspectStudent(studentId);
+                closeStudentDrawer();
             };
         } else {
-            quickArchiveBtn.innerHTML = `<i class="fa-solid fa-box-archive"></i> <span id="text-quick-archive">Arquivar</span>`;
+            quickArchiveBtn.innerHTML = `<i class="fa-solid fa-box-archive"></i> <span id="text-draw-quick-archive">Arquivar</span>`;
             quickArchiveBtn.onclick = () => {
                 archiveStudent(studentId);
-                inspectStudent(studentId);
+                closeStudentDrawer();
             };
         }
     }
-    
+
     if (quickTrashBtn) {
         quickTrashBtn.onclick = () => {
             if (confirm(`Deseja mover ${studentUser.name} para a lixeira?`)) {
                 deleteStudent(studentId);
-                backToStudentsList();
+                closeStudentDrawer();
             }
         };
     }
 
-    // Render inspector tab
-    switchInspectorTab("evolution");
+    // Reset select element
+    document.getElementById("draw-presc-day").value = activeDrawerPrescDay;
+
+    // Default tab
+    switchDrawerTab("eval");
+
+    // Slide up drawer
+    document.getElementById("coach-student-drawer").classList.remove("hidden");
 }
 
-window.switchInspectorTab = function(tabName) {
-    const evalBtn = document.getElementById("btn-inspect-evolution");
-    const prescBtn = document.getElementById("btn-inspect-prescribe");
-    const payBtn = document.getElementById("btn-inspect-payments");
-    const evalTab = document.getElementById("inspector-tab-evolution");
-    const prescTab = document.getElementById("inspector-tab-prescribe");
-    const payTab = document.getElementById("inspector-tab-payments");
+window.closeStudentDrawer = function() {
+    document.getElementById("coach-student-drawer").classList.add("hidden");
+    activeDrawerStudentId = null;
+    renderCoachStudentsList();
+};
+
+window.switchDrawerTab = function(tabName) {
+    const evalBtn = document.getElementById("btn-draw-eval");
+    const prescBtn = document.getElementById("btn-draw-presc");
+    const payBtn = document.getElementById("btn-draw-pay");
+    const evalSec = document.getElementById("drawer-tab-eval");
+    const prescSec = document.getElementById("drawer-tab-presc");
+    const paySec = document.getElementById("drawer-tab-pay");
 
     evalBtn.classList.remove("active");
     prescBtn.classList.remove("active");
     payBtn.classList.remove("active");
-    evalTab.classList.add("hidden");
-    prescTab.classList.add("hidden");
-    payTab.classList.add("hidden");
+    evalSec.classList.add("hidden");
+    prescSec.classList.add("hidden");
+    paySec.classList.add("hidden");
 
-    if (tabName === "evolution") {
+    if (tabName === "eval") {
         evalBtn.classList.add("active");
-        evalTab.classList.remove("hidden");
-        renderInspectorEvolution();
-    } else if (tabName === "prescribe") {
+        evalSec.classList.remove("hidden");
+        renderDrawerEvolution();
+    } else if (tabName === "presc") {
         prescBtn.classList.add("active");
-        prescTab.classList.remove("hidden");
-        initPrescriptionPanel();
-    } else if (tabName === "payments") {
+        prescSec.classList.remove("hidden");
+        loadDrawerWorkoutDay();
+        loadDrawerDiet();
+    } else if (tabName === "pay") {
         payBtn.classList.add("active");
-        payTab.classList.remove("hidden");
-        renderInspectorPayments();
+        paySec.classList.remove("hidden");
+        renderDrawerPayments();
     }
 };
 
-function renderInspectorEvolution() {
-    const data = db.studentData[activeInspectedStudentId];
-    
-    // Render measures history
-    const tbody = document.getElementById("inspector-metrics-table-body");
-    tbody.innerHTML = "";
+function renderDrawerEvolution() {
+    const data = db.studentData[activeDrawerStudentId];
+
+    // Render photos
+    renderMobilePhotosGallery(data.photos, "drawer-photos-gallery", false);
+
+    // Render measures list
+    const list = document.getElementById("drawer-metrics-history-list");
+    list.innerHTML = "";
 
     const sortedMeasures = [...data.measurements].reverse();
-    sortedMeasures.forEach((m) => {
-        const row = document.createElement("tr");
-        row.innerHTML = `
-            <td>${formatDate(m.date)}</td>
-            <td><strong>${m.weight} kg</strong></td>
-            <td>${m.bf}%</td>
-            <td>${m.waist} cm</td>
-            <td>${m.arms} cm</td>
-            <td>${m.legs} cm</td>
-        `;
-        tbody.appendChild(row);
-    });
-
-    // Render photo gallery (no delete permission for coach, or you can allow it - let's hide the button)
-    renderPhotosGallery(data.photos, "inspector-photos-gallery", false);
-}
-
-// ==========================================
-// 7. PRESCRIPTION ENGINE (PARSERS & COMPILERS)
-// ==========================================
-
-let activePrescriptionDay = "segunda";
-
-function initPrescriptionPanel() {
-    activePrescriptionDay = "segunda";
-    document.getElementById("prescription-workout-day-select").value = activePrescriptionDay;
-    loadPrescriptionWorkoutDay();
-    loadPrescriptionDiet();
-}
-
-window.loadPrescriptionWorkoutDay = function() {
-    activePrescriptionDay = document.getElementById("prescription-workout-day-select").value;
-    const data = db.studentData[activeInspectedStudentId];
-    const workoutData = data.workout[activePrescriptionDay];
-
-    document.getElementById("prescription-workout-focus").value = workoutData.focus;
-
-    // Convert exercises array to plain text string: "Name | details"
-    const exercisesText = workoutData.exercises.map(ex => `${ex.name} | ${ex.details}`).join("\n");
-    document.getElementById("prescription-workout-content").value = exercisesText;
-};
-
-window.savePrescribedWorkout = function() {
-    const data = db.studentData[activeInspectedStudentId];
-    const focusVal = document.getElementById("prescription-workout-focus").value.trim();
-    const contentVal = document.getElementById("prescription-workout-content").value.trim();
-
-    if (!focusVal) {
-        alert("Por favor, preencha o foco do treino!");
+    if (sortedMeasures.length === 0) {
+        list.innerHTML = `<p style="color: var(--text-muted); text-align: center; padding: 15px 0; font-size: 0.72rem;">Sem avaliações salvas.</p>`;
         return;
     }
 
-    const lines = contentVal.split("\n").filter(line => line.trim() !== "");
-    const parsedExercises = [];
+    sortedMeasures.forEach((m) => {
+        const card = document.createElement("div");
+        card.className = "metric-history-card";
+        card.innerHTML = `
+            <div class="metric-history-header">
+                <span>${formatDate(m.date)}</span>
+                <strong>Peso: ${m.weight} kg</strong>
+            </div>
+            <div class="metric-history-grid">
+                <div class="metric-history-item"><span>BF</span><strong>${m.bf}%</strong></div>
+                <div class="metric-history-item"><span>Cintura</span><strong>${m.waist}cm</strong></div>
+                <div class="metric-history-item"><span>Braço</span><strong>${m.arms}cm</strong></div>
+                <div class="metric-history-item"><span>Coxa</span><strong>${m.legs}cm</strong></div>
+            </div>
+        `;
+        list.appendChild(card);
+    });
+}
 
-    // Parse text lines: "Supino | 4x10"
+window.loadDrawerWorkoutDay = function() {
+    activeDrawerPrescDay = document.getElementById("draw-presc-day").value;
+    const data = db.studentData[activeDrawerStudentId];
+    const workoutData = data.workout[activeDrawerPrescDay];
+
+    document.getElementById("draw-presc-focus").value = workoutData.focus;
+
+    // Convert list to text lines
+    const txt = workoutData.exercises.map(ex => `${ex.name} | ${ex.details}`).join("\n");
+    document.getElementById("draw-presc-exercises").value = txt;
+};
+
+window.saveDrawerWorkout = function() {
+    const data = db.studentData[activeDrawerStudentId];
+    const focus = document.getElementById("draw-presc-focus").value.trim();
+    const content = document.getElementById("draw-presc-exercises").value.trim();
+
+    if (!focus) {
+        alert("Foco do treino é necessário!");
+        return;
+    }
+
+    const lines = content.split("\n").filter(l => l.trim() !== "");
+    const parsedExs = [];
+
     for (let i = 0; i < lines.length; i++) {
         const parts = lines[i].split("|");
         if (parts.length < 2) {
-            alert(`Erro na linha ${i+1}: Use o separador '|' para dividir o Exercício das Séries/Reps.`);
+            alert(`Erro na linha ${i+1}: Use o separador '|'`);
             return;
         }
-        parsedExercises.push({
+        parsedExs.push({
             id: `ex_${Date.now()}_${i}`,
             name: parts[0].trim(),
             details: parts[1].trim()
@@ -1372,87 +1317,63 @@ window.savePrescribedWorkout = function() {
     }
 
     // Save
-    data.workout[activePrescriptionDay].focus = focusVal;
-    data.workout[activePrescriptionDay].exercises = parsedExercises;
+    data.workout[activeDrawerPrescDay].focus = focus;
+    data.workout[activeDrawerPrescDay].exercises = parsedExs;
     
-    // Reset completions for this day so they can perform the new routine
-    workoutDataResetCompletions(data, activePrescriptionDay);
-
-    saveDb();
-    alert("Treino prescrito e salvo com sucesso!");
-    spawnSparks(width / 2, height / 2, 10);
-};
-
-function workoutDataResetCompletions(studentData, day) {
-    // Remove completions matching this day
-    Object.keys(studentData.completions).forEach(key => {
-        if (key.startsWith(`${day}_`)) {
-            delete studentData.completions[key];
+    // Reset completions for this day
+    Object.keys(data.completions).forEach(key => {
+        if (key.startsWith(`${activeDrawerPrescDay}_`)) {
+            delete data.completions[key];
         }
     });
-}
 
-function loadPrescriptionDiet() {
-    const data = db.studentData[activeInspectedStudentId];
-    
-    // Compile diet list to textual representation
-    // Format:
-    // 07:30 | Café da Manhã
-    // Alimento 1
-    // Alimento 2
-    // ---
-    // 12:00 | Almoço
-    // Alimento 3
+    saveDb();
+    alert("Treino atualizado!");
+};
+
+function loadDrawerDiet() {
+    const data = db.studentData[activeDrawerStudentId];
     const dietText = data.diet.map(meal => {
-        const header = `${meal.time} | ${meal.name}`;
-        const items = meal.items.join("\n");
-        return `${header}\n${items}`;
+        return `${meal.time} | ${meal.name}\n${meal.items.join("\n")}`;
     }).join("\n---\n");
 
-    document.getElementById("prescription-diet-content").value = dietText;
+    document.getElementById("draw-presc-diet").value = dietText;
 }
 
-window.savePrescribedDiet = function() {
-    const data = db.studentData[activeInspectedStudentId];
-    const contentVal = document.getElementById("prescription-diet-content").value.trim();
+window.saveDrawerDiet = function() {
+    const data = db.studentData[activeDrawerStudentId];
+    const content = document.getElementById("draw-presc-diet").value.trim();
 
-    if (!contentVal) {
-        alert("O plano alimentar não pode estar vazio!");
-        return;
-    }
+    if (!content) return;
 
-    const mealBlocks = contentVal.split("---");
+    const blocks = content.split("---");
     const parsedDiet = [];
 
-    for (let i = 0; i < mealBlocks.length; i++) {
-        const lines = mealBlocks[i].split("\n").map(l => l.trim()).filter(l => l !== "");
+    for (let i = 0; i < blocks.length; i++) {
+        const lines = blocks[i].split("\n").map(l => l.trim()).filter(l => l !== "");
         if (lines.length === 0) continue;
 
-        const headerLine = lines[0];
-        const headerParts = headerLine.split("|");
-        if (headerParts.length < 2) {
-            alert(`Erro no bloco ${i+1}: A primeira linha deve conter o horário e o nome separados por '|' (ex: 07:30 | Café da Manhã)`);
+        const header = lines[0];
+        const parts = header.split("|");
+        if (parts.length < 2) {
+            alert(`Erro no bloco ${i+1}: Use o formato Horário | Nome`);
             return;
         }
 
-        const mealItems = lines.slice(1);
-        if (mealItems.length === 0) {
-            alert(`Erro no bloco ${i+1}: Adicione pelo menos um item alimentar abaixo da primeira linha.`);
-            return;
-        }
+        const items = lines.slice(1);
+        if (items.length === 0) return;
 
         parsedDiet.push({
             id: `d_${Date.now()}_${i}`,
-            time: headerParts[0].trim(),
-            name: headerParts[1].trim(),
-            items: mealItems
+            time: parts[0].trim(),
+            name: parts[1].trim(),
+            items
         });
     }
 
-    // Save
     data.diet = parsedDiet;
     
-    // Reset diet completions for all days
+    // Reset diet completions
     Object.keys(data.completions).forEach(key => {
         if (key.includes("_d")) {
             delete data.completions[key];
@@ -1460,44 +1381,41 @@ window.savePrescribedDiet = function() {
     });
 
     saveDb();
-    alert("Plano alimentar prescrito e salvo com sucesso!");
-    spawnSparks(width / 2, height / 2, 10);
+    alert("Dieta atualizada!");
 };
 
 // ==========================================
-// 8. ADD/REGISTER STUDENT SYSTEM
+// 9. REGISTER STUDENT (MOBILE MODALS)
 // ==========================================
 
-const registerModal = document.getElementById("register-modal");
-const registerForm = document.getElementById("register-student-form");
+const mobRegModal = document.getElementById("mobile-register-modal");
+const mobRegForm = document.getElementById("mobile-register-form");
 
-document.getElementById("open-register-modal-btn").onclick = () => {
-    registerModal.classList.remove("hidden");
+window.openMobileRegisterModal = function() {
+    mobRegModal.classList.remove("hidden");
 };
 
-window.closeRegisterModal = function() {
-    registerModal.classList.add("hidden");
-    registerForm.reset();
+window.closeMobileRegisterModal = function() {
+    mobRegModal.classList.add("hidden");
+    mobRegForm.reset();
 };
 
-registerForm.addEventListener("submit", (e) => {
+mobRegForm.addEventListener("submit", (e) => {
     e.preventDefault();
 
-    const name = document.getElementById("reg-name").value.trim();
-    const username = document.getElementById("reg-username").value.trim().toLowerCase();
-    const password = document.getElementById("reg-password").value;
-    const age = parseInt(document.getElementById("reg-age").value);
-    const height = parseInt(document.getElementById("reg-height").value);
+    const name = document.getElementById("mob-reg-name").value.trim();
+    const username = document.getElementById("mob-reg-username").value.trim().toLowerCase();
+    const password = document.getElementById("mob-reg-password").value;
+    const age = parseInt(document.getElementById("mob-reg-age").value);
+    const height = parseInt(document.getElementById("mob-reg-height").value);
 
-    // Validate unique username
     if (db.users.some(u => u.username === username)) {
-        alert("Este usuário já está cadastrado!");
+        alert("Usuário já existe!");
         return;
     }
 
     const studentId = `u_${username}_${Date.now()}`;
 
-    // Add user account
     db.users.push({
         id: studentId,
         username,
@@ -1508,7 +1426,6 @@ registerForm.addEventListener("submit", (e) => {
         height
     });
 
-    // Initialize default templates
     db.studentData[studentId] = {
         workout: JSON.parse(JSON.stringify(DEFAULT_WORKOUT_TEMPLATE)),
         diet: JSON.parse(JSON.stringify(DEFAULT_DIET_TEMPLATE)),
@@ -1525,14 +1442,14 @@ registerForm.addEventListener("submit", (e) => {
     };
 
     saveDb();
-    alert(`Aluno ${name} cadastrado com sucesso!`);
-    closeRegisterModal();
+    alert("Aluno cadastrado!");
+    closeMobileRegisterModal();
     renderCoachStudentsList();
-    spawnSparks(width / 2, height / 2, 25);
+    spawnSparks(width / 2, height / 2, 15);
 });
 
 // ==========================================
-// 6.2 STUDENT MANAGEMENT ACTIONS (ARCHIVE & TRASH)
+// 9.2 STUDENT MANAGEMENT ACTIONS (ARCHIVE & TRASH - MOBILE)
 // ==========================================
 
 window.archiveStudent = function(studentId) {
@@ -1541,7 +1458,7 @@ window.archiveStudent = function(studentId) {
         data.isArchived = true;
         saveDb();
         renderCoachStudentsList();
-        alert("Aluno arquivado com sucesso!");
+        alert("Aluno arquivado!");
     }
 };
 
@@ -1551,7 +1468,7 @@ window.unarchiveStudent = function(studentId) {
         data.isArchived = false;
         saveDb();
         renderCoachStudentsList();
-        alert("Aluno desarquivado com sucesso!");
+        alert("Aluno desarquivado!");
     }
 };
 
@@ -1573,121 +1490,107 @@ window.restoreStudent = function(studentId) {
         data.isArchived = false;
         saveDb();
         renderCoachStudentsList();
-        alert("Aluno restaurado com sucesso!");
+        alert("Aluno restaurado!");
     }
 };
 
 window.destroyStudentPermanently = function(studentId) {
     const studentUser = db.users.find(u => u.id === studentId);
     if (!studentUser) return;
-    
-    if (confirm(`Tem certeza que deseja excluir permanentemente o aluno ${studentUser.name}?\nEsta ação NÃO pode ser desfeita e apagará todas as fichas, dietas e histórico!`)) {
-        if (confirm(`CONFIRMAÇÃO FINAL: Excluir permanentemente ${studentUser.name}?`)) {
+
+    if (confirm(`Excluir permanentemente ${studentUser.name}?\nEsta ação NÃO pode ser desfeita!`)) {
+        if (confirm(`CONFIRMAÇÃO FINAL: Excluir ${studentUser.name}?`)) {
             db.users = db.users.filter(u => u.id !== studentId);
             delete db.studentData[studentId];
             saveDb();
             renderCoachStudentsList();
-            alert("Aluno excluído permanentemente do sistema!");
+            alert("Aluno excluído!");
         }
     }
 };
 
-// Sidebar navigation handler for Coach view modes
-document.addEventListener("click", (e) => {
-    const target = e.target.closest("#nav-coach-students, #nav-coach-archived, #nav-coach-trash");
-    if (!target) return;
-    
-    document.getElementById("nav-coach-students").classList.remove("active");
-    const archivedBtn = document.getElementById("nav-coach-archived");
-    if (archivedBtn) archivedBtn.classList.remove("active");
-    const trashBtn = document.getElementById("nav-coach-trash");
-    if (trashBtn) trashBtn.classList.remove("active");
-    
-    target.classList.add("active");
-    
-    if (target.id === "nav-coach-students") {
-        coachListViewMode = "active";
-    } else if (target.id === "nav-coach-archived") {
-        coachListViewMode = "archived";
-    } else if (target.id === "nav-coach-trash") {
-        coachListViewMode = "trash";
-    }
-    backToStudentsList();
-});
-
 // ==========================================
-// 6.5 COACH FINANCE & DIRECT METRICS EDITING
+// 8.5 COACH DRAWER FINANCE & DIRECT METRICS EDITING
 // ==========================================
 
-window.renderInspectorPayments = function() {
-    const data = db.studentData[activeInspectedStudentId];
-    
-    // Set config values
-    document.getElementById("coach-student-fee").value = data.monthlyFee || 150;
-    document.getElementById("coach-pix-key").value = data.pixKey || "pix@teamalves.com.br";
-    document.getElementById("coach-bank-details").value = data.bankDetails || "Banco Itaú (341) - Agência: 1234 - Conta: 56789-0";
+window.renderDrawerPayments = function() {
+    const data = db.studentData[activeDrawerStudentId];
 
-    // Set default value for amount input in billing form
-    document.getElementById("coach-payment-amount").value = data.monthlyFee || 150;
-    document.getElementById("coach-payment-month").value = "";
-    document.getElementById("coach-payment-file").value = "";
-    document.getElementById("coach-payment-file-label").innerText = "Selecionar Imagem";
-    
-    const tbody = document.getElementById("coach-payments-table-body");
-    tbody.innerHTML = "";
+    // 1. Fill Config inputs
+    document.getElementById("draw-student-fee").value = data.monthlyFee || 150;
+    document.getElementById("draw-pix-key").value = data.pixKey || "pix@teamalves.com.br";
+    document.getElementById("draw-bank-details").value = data.bankDetails || "Banco Itaú (341) - Agência: 1234 - Conta: 56789-0";
+
+    // 2. Set Billing defaults
+    document.getElementById("draw-payment-amount").value = data.monthlyFee || 150;
+    document.getElementById("draw-payment-month").value = "";
+    document.getElementById("coach-mob-payment-file").value = "";
+    document.getElementById("coach-mob-payment-file-label").innerText = "Selecionar Imagem";
+
+    // 3. Render Payments History inside drawer
+    const list = document.getElementById("drawer-payments-history-list");
+    list.innerHTML = "";
 
     const sortedPayments = [...(data.payments || [])].reverse();
 
     if (sortedPayments.length === 0) {
-        tbody.innerHTML = `<tr><td colspan="6" style="text-align: center; color: var(--text-muted); padding: 20px;">Nenhuma cobrança registrada para este aluno.</td></tr>`;
+        list.innerHTML = `<p style="color: var(--text-muted); text-align: center; padding: 15px 0; font-size: 0.72rem;">Nenhuma cobrança registrada.</p>`;
         return;
     }
 
     sortedPayments.forEach((pay) => {
-        const row = document.createElement("tr");
+        const item = document.createElement("div");
+        item.className = "payment-list-item-mobile glass-panel";
+        item.style.background = "rgba(255,255,255,0.01)";
+        item.style.flexDirection = "column";
+        item.style.alignItems = "stretch";
+        item.style.gap = "8px";
 
         const statusClass = pay.status.toLowerCase() === 'pago' ? 'pago' : 'pendente';
         const badgeHTML = `<span class="status-badge ${statusClass}">${pay.status}</span>`;
 
-        let attachmentHTML = `<span style="color:var(--text-muted); font-size:0.75rem;">Sem anexo</span>`;
+        let attachmentHTML = `<span style="color:var(--text-muted); font-size:0.65rem;">Sem anexo</span>`;
         if (pay.attachmentSrc) {
-            attachmentHTML = `<button class="btn-view-proof" onclick="viewPaymentAttachment('${activeInspectedStudentId}', '${pay.id}')">
+            attachmentHTML = `<button class="btn-view-proof" onclick="viewPaymentAttachment('${activeDrawerStudentId}', '${pay.id}')">
                                 <i class="fa-solid fa-receipt"></i> Ver Anexo
                               </button>`;
         }
 
-        row.innerHTML = `
-            <td>${formatDate(pay.date || new Date().toISOString().split("T")[0])}</td>
-            <td><strong>${pay.monthRef}</strong></td>
-            <td>R$ ${parseFloat(pay.amount).toFixed(2).replace('.', ',')}</td>
-            <td>${badgeHTML}</td>
-            <td>${attachmentHTML}</td>
-            <td>
-                <button class="btn-secondary" onclick="toggleCoachPaymentStatus('${pay.id}')" style="width: auto; padding: 4px 8px; font-size: 0.72rem; margin-right: 6px; height: 26px;">
-                    <i class="fa-solid fa-arrows-rotate"></i> Alternar
+        item.innerHTML = `
+            <div style="display:flex; justify-content:space-between; align-items:center;">
+                <h4 style="font-size:0.8rem;">${pay.monthRef}</h4>
+                ${badgeHTML}
+            </div>
+            <div style="display:flex; justify-content:space-between; align-items:center; font-size:0.68rem; color:var(--text-secondary);">
+                <span>Valor: R$ ${parseFloat(pay.amount).toFixed(2).replace('.', ',')}</span>
+                ${attachmentHTML}
+            </div>
+            <div style="display:flex; gap:8px; margin-top:4px;">
+                <button class="btn-secondary" onclick="toggleDrawerPaymentStatus('${pay.id}')" style="flex:1; height:26px; font-size:0.7rem; padding:0;">
+                    <i class="fa-solid fa-arrows-rotate"></i> Status
                 </button>
-                <button class="btn-danger" onclick="deleteCoachPaymentRecord('${pay.id}')" style="width: auto; padding: 4px 8px; font-size: 0.72rem; height: 26px;">
+                <button class="btn-danger" onclick="deleteDrawerPaymentRecord('${pay.id}')" style="flex:1; height:26px; font-size:0.7rem; padding:0;">
                     <i class="fa-solid fa-trash"></i> Excluir
                 </button>
-            </td>
+            </div>
         `;
-        tbody.appendChild(row);
+        list.appendChild(item);
     });
 };
 
-window.saveCoachPaymentConfig = function() {
-    const data = db.studentData[activeInspectedStudentId];
-    data.monthlyFee = parseFloat(document.getElementById("coach-student-fee").value) || 150;
-    data.pixKey = document.getElementById("coach-pix-key").value.trim();
-    data.bankDetails = document.getElementById("coach-bank-details").value.trim();
+window.saveDrawerPaymentConfig = function() {
+    const data = db.studentData[activeDrawerStudentId];
+    data.monthlyFee = parseFloat(document.getElementById("draw-student-fee").value) || 150;
+    data.pixKey = document.getElementById("draw-pix-key").value.trim();
+    data.bankDetails = document.getElementById("draw-bank-details").value.trim();
 
     saveDb();
-    alert("Configurações de faturamento salvas com sucesso!");
-    renderInspectorPayments();
+    alert("Configurações salvas!");
+    renderDrawerPayments();
 };
 
-window.toggleCoachPaymentStatus = function(paymentId) {
-    const data = db.studentData[activeInspectedStudentId];
+window.toggleDrawerPaymentStatus = function(paymentId) {
+    const data = db.studentData[activeDrawerStudentId];
     const payment = data.payments.find(p => p.id === paymentId);
     if (payment) {
         payment.status = payment.status === "Pago" ? "Pendente" : "Pago";
@@ -1695,39 +1598,39 @@ window.toggleCoachPaymentStatus = function(paymentId) {
             payment.date = new Date().toISOString().split("T")[0];
         }
         saveDb();
-        renderInspectorPayments();
+        renderDrawerPayments();
     }
 };
 
-window.deleteCoachPaymentRecord = function(paymentId) {
+window.deleteDrawerPaymentRecord = function(paymentId) {
     if (confirm("Deseja realmente excluir esta cobrança?")) {
-        const data = db.studentData[activeInspectedStudentId];
+        const data = db.studentData[activeDrawerStudentId];
         data.payments = data.payments.filter(p => p.id !== paymentId);
         saveDb();
-        renderInspectorPayments();
+        renderDrawerPayments();
     }
 };
 
-// Coach Payment file select change listener
+// File change label update listener for mobile coach
 document.addEventListener("change", (e) => {
-    if (e.target && e.target.id === "coach-payment-file") {
+    if (e.target && e.target.id === "coach-mob-payment-file") {
         const file = e.target.files[0];
-        const label = document.getElementById("coach-payment-file-label");
+        const label = document.getElementById("coach-mob-payment-file-label");
         if (label) {
             label.innerText = file ? file.name : "Selecionar Imagem";
         }
     }
 });
 
-// Coach Payment Form submit listener
+// Coach mobile payment form submit listener
 document.addEventListener("submit", (e) => {
-    if (e.target && e.target.id === "coach-payment-form") {
+    if (e.target && e.target.id === "coach-mob-payment-form") {
         e.preventDefault();
-        const data = db.studentData[activeInspectedStudentId];
-        const monthVal = document.getElementById("coach-payment-month").value.trim();
-        const amountVal = parseFloat(document.getElementById("coach-payment-amount").value) || 0;
-        const statusVal = document.getElementById("coach-payment-status").value;
-        const fileInput = document.getElementById("coach-payment-file");
+        const data = db.studentData[activeDrawerStudentId];
+        const monthVal = document.getElementById("draw-payment-month").value.trim();
+        const amountVal = parseFloat(document.getElementById("draw-payment-amount").value) || 0;
+        const statusVal = document.getElementById("draw-payment-status").value;
+        const fileInput = document.getElementById("coach-mob-payment-file");
         const file = fileInput ? fileInput.files[0] : null;
 
         const newPayment = {
@@ -1745,45 +1648,44 @@ document.addEventListener("submit", (e) => {
             reader.onload = (event) => {
                 newPayment.attachmentName = file.name;
                 newPayment.attachmentSrc = event.target.result;
-                
+
                 data.payments.push(newPayment);
                 saveDb();
-                alert("Cobrança lançada com sucesso (com anexo)!");
-                renderInspectorPayments();
+                alert("Cobrança lançada!");
+                renderDrawerPayments();
             };
             reader.readAsDataURL(file);
         } else {
             data.payments.push(newPayment);
             saveDb();
-            alert("Cobrança lançada com sucesso!");
-            renderInspectorPayments();
+            alert("Cobrança lançada!");
+            renderDrawerPayments();
         }
     }
 });
 
-// Coach Measurements Form submit listener
+// Coach mobile student measurements form submit listener
 document.addEventListener("submit", (e) => {
-    if (e.target && e.target.id === "coach-measurements-form") {
+    if (e.target && e.target.id === "coach-mob-measurements-form") {
         e.preventDefault();
-        const data = db.studentData[activeInspectedStudentId];
+        const data = db.studentData[activeDrawerStudentId];
 
         const newMeasure = {
             date: new Date().toISOString().split("T")[0],
-            weight: parseFloat(document.getElementById("coach-metric-weight").value),
-            bf: parseFloat(document.getElementById("coach-metric-bf").value),
-            chest: parseFloat(document.getElementById("coach-metric-chest").value),
-            waist: parseFloat(document.getElementById("coach-metric-waist").value),
-            arms: parseFloat(document.getElementById("coach-metric-arms").value),
-            legs: parseFloat(document.getElementById("coach-metric-legs").value)
+            weight: parseFloat(document.getElementById("coach-mob-metric-weight").value),
+            bf: parseFloat(document.getElementById("coach-mob-metric-bf").value),
+            waist: parseFloat(document.getElementById("coach-mob-metric-waist").value),
+            arms: parseFloat(document.getElementById("coach-mob-metric-arms").value),
+            legs: 0, chest: 0 // mobile defaults
         };
 
         data.measurements.push(newMeasure);
         saveDb();
 
         e.target.reset();
-        renderInspectorEvolution();
-        spawnSparks(width / 2, height / 2, 15);
-        alert("Medidas do aluno registradas com sucesso pelo treinador!");
+        renderDrawerEvolution();
+        spawnSparks(width / 2, height / 2, 10);
+        alert("Novas medidas salvas!");
     }
 });
 
